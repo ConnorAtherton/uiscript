@@ -1,0 +1,23 @@
+{
+  "name": "uiscript",
+  "version": "0.1.0",
+  "description": "A human-readable web ui manipulation language",
+  "main": "src/uiscript.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ConnorAtherton/uiscript.git"
+  },
+  "keywords": [
+    "ui",
+    "script"
+  ],
+  "author": "Connor Atherton <cliam.atherton@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ConnorAtherton/uiscript/issues"
+  },
+  "homepage": "https://github.com/ConnorAtherton/uiscript#readme"
+}
