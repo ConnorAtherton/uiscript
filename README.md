@@ -108,6 +108,8 @@ end
 
 ### Sequences
 
+[TODO]
+
 Sequences are a linear conbination of actions.
 
 Use sequences when:

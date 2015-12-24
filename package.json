@@ -19,5 +19,12 @@
   "bugs": {
     "url": "https://github.com/ConnorAtherton/uiscript/issues"
   },
-  "homepage": "https://github.com/ConnorAtherton/uiscript#readme"
+  "homepage": "https://github.com/ConnorAtherton/uiscript#readme",
+  "dependencies": {
+    "glob": "^6.0.1",
+    "minimist": "^1.2.0"
+  },
+  "devDependencies": {
+    "ava": "^0.7.0"
+  }
 }
