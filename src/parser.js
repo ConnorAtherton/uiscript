@@ -1,8 +1,4 @@
-export default function parse() {
-
-}
-
-class Parser() {
+export default class Parser {
   constructor(lexer) {
     // holds a reference to all variables declared in the script
     // with the @ stripped off
@@ -11,20 +7,28 @@ class Parser() {
   }
 
   // Should always be called first
+  // Each line should only begin with one of 3 tokens.
   parse() {
-    let type = null
+    let token = null
 
-    while ((type = this.lexer.nextToken()).type) {
+    while (token = this.lexer.peek()) {
       // @name ...
-      if (type = types.variableName) {
+      if (token === '@')
         this.parseVariableAssignment()
       // when ...
-      } else if (type = ) {
+      else if (token === 'w')
         this.parseUiDeclaration()
-      } else {
+      // / ...
+      else if (token === '/')
+        this.stripComment()
+      else
         this.error()
-      }
     }
+  }
+
+  stripComment() {
+    this.assert(this.lexer.next(), '/')
+    this.lexer.skipLine()
   }
 
   parseVariableAssignment() {
@@ -39,6 +43,7 @@ class Parser() {
   }
 
   parseSelectorString() {
+    this.lexer.skipWhitespace()
     this.assert(this.lexer.next(), '"')
 
     this.assert(this.lexer.next(), '"')
@@ -55,13 +60,17 @@ class Parser() {
 
   }
 
-  // <action> <selector> (? on <variable_name>)
+  // <action> <expression> (? on <variable_name>)
+  // toggle ".is-open"
+  // toggle ".is-open" on @element
+  // toggle ".is-open" on ".different-element"
   parseBlockStatement() {
 
   }
 
   assert(actual, expected) {
-
+    if (actual.type === expected) { return true }
+    this.lexer.error(`Expected ${expected} at ${actual.position}`)
   }
 
   // Ensures that the next token matches the token passed as the only argument

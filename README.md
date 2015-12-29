@@ -2,7 +2,7 @@
 
 A web UI manipulation language for humans.
 
-uiscript is a simple language for ma. uiscript makes the
+uiscript is a simple language for. uiscript makes the
 the following assumptions:
 
 - Animations should be declared in css using stateful classes (.is-open, .has-hovered)
@@ -49,29 +49,30 @@ Run `uiscript` to see all possible options.
 ## Syntax
 
 A simple example to add a class on the element when it is clicked on.
-Notice that `@element` inside the `then .. end` refers to the event
+The `@element` inside the `then .. end` refers to the event
 target.
 
 ```
 // This is a comment
 when I 'click' on '.menu_item' then
-  toggle '.open' on @element
+  toggle '.is-open' on @element
 end
 ```
 
-You can then animation the element using css transforms and css animations.
+You can then let css animate the element using css transforms and css animations.
 
 ```css
 .menu_item {
-
+  opacity: 0;
+  transition: opacity 200ms linear;
 }
 
-.menu_item.open {
-
+.menu_item.is-open {
+  opacity: 1;
 }
 ```
 
-The `on @element` can be omitted. uiscript will implicitly
+The `on @element` can be omitted and uiscript will implicitly
 assume any actions you take will be related to the event target (@element).
 
 ```
@@ -82,8 +83,7 @@ end
 
 ### Caching variables
 
-We can cache variables
-to avoid jumping back into the DOM every time
+We can cache variables to avoid jumping back into the DOM every time
 an event fires.
 
 This is most useful when animating static
@@ -97,11 +97,11 @@ the page.
 ```
 
 We can then use that cached reference in our animation
-declerations.
+declarations.
 
 ```
 // Add a click event on a cached DOM element
-when I click on @menu_item then
+when I 'click' on @menu_item then
   toggle '.open' on @element
 end
 ```
@@ -142,10 +142,10 @@ end
 This is an initial list that will be expanded
 in future releases.
 
-- clicks on
-- doubleclicks on
-- hovers on
-- mouses up
-- mouses down
-- mouses over
+- click
+- doubleclick
+- hover
+- mousup
+- mousedown
+- mouseover
 

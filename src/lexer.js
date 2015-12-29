@@ -1,12 +1,7 @@
-export default function lex(glob) {
-
-}
-
 export const formats = {
   variableName: 'abc',
   whitespace: ' \t\r\n',
-  // taken from the sizzle engine
-  selector: ''
+  // take from the sizzle engine
 }
 
 export const keywords = {
@@ -20,16 +15,23 @@ export const keywords = {
 
 export const types = {
   variableName: Symbol('UI_VARIABLE_NAME'),
-  uiDeclarationStart: Symbol('UI_DECLARATION_START')
+  string: Symbol('UI_STRING'),
+  uiDeclarationStart: Symbol('UI_DECLARATION_START'),
+  uiDeclarationEnd: Symbol('UI_DECLARATION_END')
 }
 
 //
-// The actual lexer class
+// Lexer
 //
-class Lexer {
+// This is the class responsible for breaking up the
+// input stream into tokens that the parser can recognize
+// and use to run the program.
+//
+export default class Lexer {
   constructor(source) {
-    // the string to break into tokens
-    this.source = source
+    // Force the source into a string so we can accept
+    // a Buffer object as an input too
+    this.source = source.toString()
     this.sourceLength = source.length
 
     // holds the position of the current character
@@ -38,6 +40,9 @@ class Lexer {
 
     // holds the position in the source string
     this.index = 0
+
+    // stores all the tokens from the source
+    this.tokens = []
   }
 
   position() {
@@ -51,14 +56,14 @@ class Lexer {
   // and moves the index pointer to the next character
   next() {
     if (this.willOverflow()) { return null }
-    character = this.source[this.index++]
+    let character = this.source[this.index++]
 
     // TODO: note down the current line and char number for debugging
     if (character === '\n') {
-      this.line++;
-      this.lineCharacter = 0;
+      this.line++
+      this.lineCharacter = 0
     } else {
-      this.lineCharacter++;
+      this.lineCharacter++
     }
 
     return character
@@ -81,67 +86,142 @@ class Lexer {
     while (formats.whitespace.includes(this.peek())) { this.next() }
   }
 
-  lex() {
-    // TODO: do we want to take one full pase first removing
-    // comments and empty lines?
+  skipLine() {
+    while (this.next() !== '\n') {}
+  }
 
-    // let's take a look at the next token
-    let cur = this.peek()
+  //
+  // We'll do this using two passes and build the token stream
+  // before the parser constructs the AST
+  //
+  lex() {
+    while (!this.willOverflow()) {
+      this.tokens.push(this.tokenize())
+    }
+
+    return this.tokens
+  }
+
+  // Finds and returns the next token in the input string. Will throw an
+  // error if the token is malformed.
+  tokenize() {
+    let character = this.peek()
+
+    if (character === '@') {
+      return this.lexVariableName()
+    } else if (character === '"') {
+      return this.lexString()
+    } else if (character === 't') {
+      return this.declarationBlock()
+    } else if (formats.whitespace.indexOf(character) !== -1) {
+      this.skipWhitespace()
+      return this.tokenize()
+    } else if (character === '/') {
+      this.lexComment()
+      return this.scan()
+    } else {
+      // unknown character
+      console.log('unknown character')
+    }
   }
 
   //
   // Each method will lex through a unique token type
   //
 
-  lexName() {
-    let position = this.position()
-    let name = ''
+  lexSingle() {
+    let single = this.next()
 
-    while (formats.variableName.includes(this.peek().toLowerCase()) {
+    // this.assertType(single)
+
+    return {
+      type: types[single],
+      value: single,
+      position: this.position()
+    }
+  }
+
+  lexVariableName() {
+    let startPosition = this.position()
+    // grab initial @
+    let name = this.next()
+
+    //
+    // TODO: remove this lower case call
+    //
+    while (formats.variableName.includes(this.peek().toLowerCase())) {
       name += this.next()
     }
 
     return {
       type: types.variableName,
       value: name,
-      position: position
+      position: startPosition
     }
   }
 
-  // TODO: allow comments at the end of lines too
-  lexComment() {
+  lexString() {
+    let startPosition = this.position()
+    let string = ''
+    this.next()
 
+    while (this.r.peek() && this.r.peek() !== '"') {
+      string += this.next()
+    }
+
+    if (this.next() !== '"') {
+      this.errorExpected('"') // `Expect '"' at ${pos}, saw ${}`)
+    }
+
+    return {
+      value: string,
+      type: types.string,
+      position: startPosition
+    }
   }
 
+  //
+  // TODO: allow comments at the end of lines too
+  //
+  lexComment() {
+    this.assert(this.lexer.next(), '/', (position) => {
+      this.error(`Unexpected character '/' at ${position}`)
+    })
+
+    this.skipLine()
+  }
+
+  //
   // <ui_declaration> then
   //  <block_statement_list>
   // end
+  //
   lexBlock() {
-
+    this.lexBlockOpen()
+    this.lexBlockStatements()
+    this.lexBlockClose()
   }
 
   //
   // then
   //
   lexBlockOpen() {
-    this.assertToken(token.blockStart)
+    this.assertToken(keywords.blockStart)
   }
 
   //
   // end
   //
   lexBlockClose() {
-    this.assertToken(token.blockEnd)
+    this.assertToken(keywords.blockEnd)
+  }
+
+  //
+  // Statements list
+  //
+  lexBlockStatements() {
   }
 
   lexIndentifer() {
-
-  }
-
-  //
-  // Valid css selector (steal from sizzle)
-  //
-  lexSelector() {
-
   }
 }
