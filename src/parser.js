@@ -1,29 +1,34 @@
+import { types } from './lexer'
+
 export default class Parser {
   constructor(lexer) {
     // holds a reference to all variables declared in the script
     // with the @ stripped off
     this.variables = {}
     this.lexer = lexer
+
+    // split into tokens
+    this.lexer.lex()
   }
 
   // Should always be called first
   // Each line should only begin with one of 3 tokens.
   parse() {
-    let token = null
+    let type = null
 
-    while (token = this.lexer.peek()) {
-      // @name ...
-      if (token === '@')
-        this.parseVariableAssignment()
-      // when ...
-      else if (token === 'w')
-        this.parseUiDeclaration()
-      // / ...
-      else if (token === '/')
-        this.stripComment()
-      else
-        this.error()
-    }
+    console.log('begin parsing with tokens: \n', this.lexer.tokens)
+
+    // while (type = this.lexer.peek().type) {
+    //   // @name ...
+    //   if (type === types.typeVariableName) {
+    //     this.parseVariableAssignment()
+    //   // when ...
+    //   } else if (type === types,uiDeclarationStart) {
+    //     this.parseUiDeclaration()
+    //   } else {
+    //     this.error()
+    //   }
+    // }
   }
 
   stripComment() {

@@ -1,3 +1,12 @@
 //
 // This is a file that only has comments
 //
+
+@abc = "string"
+
+when I "click" on "selector" then
+  add ".is-open" on @ccc
+  remove ".is-clean"
+end
+
+

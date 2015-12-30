@@ -1,24 +1,51 @@
+// TODO: import node debug module and place inside the lexer for
+// easier debugging until I add some tests to this
+
 export const formats = {
+  // TODO: range helper for groups of allowed characters
   variableName: 'abc',
   whitespace: ' \t\r\n',
-  // take from the sizzle engine
 }
 
-export const keywords = {
-  blockStart: 'then',
-  blockEnd: 'end',
-  addAction: 'add',
-  removeAction: 'remove',
-  toggleAction: 'toggle',
-  uiDeclarationStart: 'when'
-}
+export const keywords = [
+  'then', 'end', 'add',
+  'remove', 'toggle', 'when',
+  'I', 'on'
+]
 
+//
+// Each keyword should respond to a type
+//
 export const types = {
   variableName: Symbol('UI_VARIABLE_NAME'),
   string: Symbol('UI_STRING'),
-  uiDeclarationStart: Symbol('UI_DECLARATION_START'),
-  uiDeclarationEnd: Symbol('UI_DECLARATION_END')
+  declarationStart: Symbol('UI_DECLARATION_START'),
+  declarationBlockStart: Symbol('UI_DECLARATION_BLOCK_START'),
+  declarationBlockEnd: Symbol('UI_DECLARATION_BLOCK_END'),
+  trigger: Symbol('UI_TRIGGER'),
+  '=': Symbol('UI_ASSIGNMENT'),
+  // these tokens are just to keep the language sounding natural for
+  // humans and the they are optional for the parser
+  naturalLang: Symbol('UI_NATURAL_LANG'),
+
+  // Special lexeme type
+  EOF: Symbol('UI_EOF'),
 }
+
+//
+// keyword types mappings
+//
+// Keep these distinct from the actual types to make it easier
+// to modify the keywords later on.
+//
+types.then = types.declarationBlockStart
+types.end = types.declarationBlockEnd
+types.add = types.trigger
+types.remove = types.trigger
+types.toggle = types.trigger
+types.when = types.declarationStart
+types.I = types.naturalLang
+types.on = types.naturalLang
 
 //
 // Lexer
@@ -35,28 +62,30 @@ export default class Lexer {
     this.sourceLength = source.length
 
     // holds the position of the current character
-    this.line = 0
-    this.lineCharacter = 0
+    this.line = 1
+    this.lineCharacter = 1
 
     // holds the position in the source string
-    this.index = 0
+    this.index = -1
 
     // stores all the tokens from the source
     this.tokens = []
   }
 
-  position() {
+  get position() {
     return {
       line: this.line,
       character: this.lineCharacter
     }
   }
 
-  // increments to the next char in the source
-  // and moves the index pointer to the next character
+  //
+  // Increments to the next character in the token stream
+  // and moves the increments the index pointer
+  //
   next() {
     if (this.willOverflow()) { return null }
-    let character = this.source[this.index++]
+    let character = this.source[++this.index]
 
     // TODO: note down the current line and char number for debugging
     if (character === '\n') {
@@ -69,17 +98,26 @@ export default class Lexer {
     return character
   }
 
-  // returns the characters currently pointed at
+  //
+  // returns the character currently pointed at
   // without advancing the index
+  //
   peek() {
     if (this.willOverflow()) { return null }
+    return this.source[this.index + 1]
+  }
+
+  //
+  // Shows the character at the current pointer position
+  //
+  current() {
     return this.source[this.index]
   }
 
   // Check that we don't try and advance the index
   // past the end of the file.
   willOverflow() {
-    return this.index >= this.sourceLength
+    return this.index >= this.sourceLength - 1
   }
 
   skipWhitespace() {
@@ -102,26 +140,31 @@ export default class Lexer {
     return this.tokens
   }
 
-  // Finds and returns the next token in the input string. Will throw an
-  // error if the token is malformed.
+  // Finds and returns the next non-whitespace token in the input
+  // string. Will throw an error if the token is malformed.
   tokenize() {
-    let character = this.peek()
+    let character = this.next()
 
     if (character === '@') {
       return this.lexVariableName()
+    } else if (character === null) {
+      return { val: null, type: types.EOF, position: this.position }
     } else if (character === '"') {
       return this.lexString()
-    } else if (character === 't') {
-      return this.declarationBlock()
-    } else if (formats.whitespace.indexOf(character) !== -1) {
-      this.skipWhitespace()
-      return this.tokenize()
     } else if (character === '/') {
       this.lexComment()
-      return this.scan()
+      return this.tokenize()
+    } else if ('='.includes(character)) {
+      return this.lexSingle()
+    } else if (formats.whitespace.includes(character)) {
+      this.skipWhitespace()
+      return this.tokenize()
+    } else if (this.keywordStart(character)) {
+      return this.lexKeyword()
+      throw Error
     } else {
       // unknown character
-      console.log('unknown character')
+      console.log('unknown character', character)
     }
   }
 
@@ -129,49 +172,103 @@ export default class Lexer {
   // Each method will lex through a unique token type
   //
 
+  // returns a match
+  keywordIndexMatch(character, index, keywordSet = keywords) {
+    let acc = []
+
+    for (let keyword of keywordSet) {
+      // index out of bounds for the keyword
+      if (index > keyword.length - 1) { continue }
+      if (character === keyword[index]) { acc.push(keyword) }
+    }
+
+    return acc
+  }
+
+  // returns true if the character is the start of any keywords
+  // in the language
+  keywordStart(character) {
+    return !!this.keywordIndexMatch(character, 0).length
+  }
+
+  lexKeyword() {
+    let startPosition = this.position
+    let index = 0
+    let matches = this.keywordIndexMatch(this.current(), index)
+    let finalMatch
+
+    // tokens must be surrounded by whitespace
+    while (matches.length && !formats.whitespace.includes(this.peek())) {
+      // increment both pointers at the same time
+      this.next() && index++
+
+      // limit possible keywords to those already matched at lower indices
+      matches = this.keywordIndexMatch(this.current(), index, matches)
+    }
+
+    finalMatch = matches[0]
+
+    // if we have reached a space but the keyword isn't valid
+    if (!finalMatch) { this.errorExpected('keyword', startPosition) }
+
+    return {
+      type: types[finalMatch],
+      value: finalMatch,
+      position: startPosition
+    }
+  }
+
   lexSingle() {
-    let single = this.next()
+    let single = this.current()
+    // console.log('lexing single char -> ', single)
 
     // this.assertType(single)
 
     return {
       type: types[single],
       value: single,
-      position: this.position()
+      position: this.position
     }
   }
 
   lexVariableName() {
-    let startPosition = this.position()
-    // grab initial @
-    let name = this.next()
+    // console.log('lexing variable name')
 
-    //
-    // TODO: remove this lower case call
-    //
-    while (formats.variableName.includes(this.peek().toLowerCase())) {
-      name += this.next()
+    let startPosition = this.position
+    let varName = this.next()
+
+    // NOTE: ignore the initial @ symbol
+    // but expect the next character to be valid
+    if (!this.assert(formats.variableName.includes(varName), true)) {
+      this.errorExpected('a valid variable name character')
     }
+
+    while (formats.variableName.includes(this.peek())) {
+      varName += this.next()
+    }
+
+    // console.log('lexing a variable -> ', varName)
 
     return {
       type: types.variableName,
-      value: name,
+      value: varName,
       position: startPosition
     }
   }
 
   lexString() {
-    let startPosition = this.position()
-    let string = ''
-    this.next()
+    // console.log('lexing string value')
 
-    while (this.r.peek() && this.r.peek() !== '"') {
+    let startPosition = this.position
+    let string = this.next()
+
+    while (this.peek() && this.peek() !== '"') {
       string += this.next()
     }
 
-    if (this.next() !== '"') {
-      this.errorExpected('"') // `Expect '"' at ${pos}, saw ${}`)
-    }
+    if (this.next() !== '"') { this.errorExpected('"') }
+
+    // console.log('lexing a string -> ', string)
 
     return {
       value: string,
@@ -184,44 +281,36 @@ export default class Lexer {
   // TODO: allow comments at the end of lines too
   //
   lexComment() {
-    this.assert(this.lexer.next(), '/', (position) => {
-      this.error(`Unexpected character '/' at ${position}`)
+    // console.log('lexing comment')
+
+    this.assert(this.peek(), '/', () => {
+      this.errorExpected('/')
     })
 
+    // consume the next token and skip the rest of the line
+    this.next()
     this.skipLine()
   }
 
-  //
-  // <ui_declaration> then
-  //  <block_statement_list>
-  // end
-  //
-  lexBlock() {
-    this.lexBlockOpen()
-    this.lexBlockStatements()
-    this.lexBlockClose()
+  // asserts the equality of two chracters
+  assert(actual, expected, func) {
+    if (actual !== expected) {
+      func && func()
+      return false
+    }
+
+    return true
   }
 
-  //
-  // then
-  //
-  lexBlockOpen() {
-    this.assertToken(keywords.blockStart)
+  error(message) {
+    throw new Error(message)
   }
 
-  //
-  // end
-  //
-  lexBlockClose() {
-    this.assertToken(keywords.blockEnd)
+  errorExpected(expectStr, position = this.position) {
+    this.error(`Expected ${expectStr} at ${this.formatPosition(position)}`)
   }
 
-  //
-  // Statements list
-  //
-  lexBlockStatements() {
-  }
-
-  lexIndentifer() {
+  formatPosition(position = this.position) {
+    return `L${position.line} C${position.character}`
   }
 }

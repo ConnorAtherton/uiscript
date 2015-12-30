@@ -12,11 +12,5 @@ fs.readFile(fp, function(err, source) {
   let lexer = new Lexer(source)
   let parser = new Parser(lexer)
 
-  // Print every character
-  //
-  // do {
-  //   console.log(lexer.peek())
-  // } while (lexer.next())
-
   parser.parse()
 })
