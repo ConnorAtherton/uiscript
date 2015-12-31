@@ -1,10 +1,11 @@
 import { types } from './lexer'
+import ScopeStack from './scopeStack'
 
 export default class Parser {
   constructor(lexer) {
     // holds a reference to all variables declared in the script
     // with the @ stripped off
-    this.variables = {}
+    this.scopes = new ScopeStack()
     this.lexer = lexer
 
     // split into tokens
@@ -14,55 +15,70 @@ export default class Parser {
   // Should always be called first
   // Each line should only begin with one of 3 tokens.
   parse() {
-    let type = null
+    if (this.lexer.empty()) { return true }
 
-    console.log('begin parsing with tokens: \n', this.lexer.tokens)
+    // we know we have at least once token so don't need to type check
+    let type = this.lexer.nextTokenType()
 
-    // while (type = this.lexer.peek().type) {
-    //   // @name ...
-    //   if (type === types.typeVariableName) {
-    //     this.parseVariableAssignment()
-    //   // when ...
-    //   } else if (type === types,uiDeclarationStart) {
-    //     this.parseUiDeclaration()
-    //   } else {
-    //     this.error()
-    //   }
-    // }
-  }
+    while (type) {
+      console.log(type)
 
-  stripComment() {
-    this.assert(this.lexer.next(), '/')
-    this.lexer.skipLine()
+      // @name ...
+      if (type === types.variableName) {
+        this.parseVariableAssignment()
+      // when ...
+      } else if (type === types.declarationStart) {
+        this.parseUiDeclaration()
+      } else {
+        this.error()
+      }
+
+      // fetch the next token if there is one
+      type = this.lexer.empty() ? null : this.lexer.nextTokenType()
+    }
   }
 
   parseVariableAssignment() {
-    this.assert(this.lexer.next(), '@')
-    let varName = this.parseVariableName()
-    this.assert(this.lexer.next(), '=')
-    let selector = this.parseSelectorString()
+    let varName = this.lexer.nextToken()
+    this.assert(varName.type, types.variableName)
 
-    // store this for later
-    // TODO: querySelectorAll?
-    variables[varName] = document.querySelector(selector)
+    this.assert(this.lexer.nextToken().type, types.assignment)
+
+    let varValue = this.lexer.nextToken()
+    this.assert(varValue.type, types.string)
+
+    this.scopes.add(varName.value, varValue.value)
   }
 
-  parseSelectorString() {
-    this.lexer.skipWhitespace()
-    this.assert(this.lexer.next(), '"')
+  parseUiDeclaration() {
+    this.assert(this.lexer.nextToken().type, types.declarationStart)
+    this.assert(this.lexer.nextToken().type, types.naturalLang)
 
-    this.assert(this.lexer.next(), '"')
+    let action = this.lexer.nextToken()
+    this.assert(action.type, types.string)
+
+    this.assert(this.lexer.nextToken().type, types.naturalLang)
+
+    let selector = this.lexer.nextToken()
+    this.assert(selector.type, types.string)
+
+    this.parseBlock()
   }
 
   parseBlock() {
-    this.assertToken(keywords.blockStart)
+    this.assert(this.lexer.nextToken().type, types.declarationBlockStart)
+
+    // Scope gate..
+    this.scopes.addScope()
+
     this.parseBlockStatements()
-    this.assertToken(keywords.blockEnd)
+    this.assert(this.lexer.nextToken().type, types.declarationBlockStart)
+
+    // TODO: we should remove the scope here
   }
 
   parseBlockStatements() {
-
-
+    while (this.lexer.nextTokenType() === types.trigger) { this.parseBlockStatement() }
   }
 
   // <action> <expression> (? on <variable_name>)
@@ -70,30 +86,18 @@ export default class Parser {
   // toggle ".is-open" on @element
   // toggle ".is-open" on ".different-element"
   parseBlockStatement() {
+    let trigger = this.lexer.nextToken()
+    this.assert(trigger.type, types.trigger)
 
+    let selector = this.lexer.nextToken()
+    this.assert(selector.type, types.string)
+
+    // NOTE: optional and it will just be bound to the current event
   }
 
   assert(actual, expected) {
-    if (actual.type === expected) { return true }
-    this.lexer.error(`Expected ${expected} at ${actual.position}`)
-  }
-
-  // Ensures that the next token matches the token passed as the only argument
-  // and throws an error otherwise.
-  assertToken(token) {
-    let len = token.length
-    let acc = ''
-
-    // there should be at least one token
-    this.assert(this.lexer.next(), ' ')
-
-    // skip all whitespace
-    this.lexer.skipWhitespace()
-
-    // skip len chars
-    for (let i = 0; i < len; i++) { acc += this.lexer.next() }
-
-    // now the two strings should equal each other
-    this.assert(acc, token)
+    if (actual === expected) { return true }
+    // Doing this right now for this problem https://github.com/nodejs/node/issues/927
+    this.lexer.error(`Expected ${String(expected)} at ${String(actual.position)}`)
   }
 }

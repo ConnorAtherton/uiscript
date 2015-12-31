@@ -3,8 +3,9 @@
 //
 
 @abc = "string"
+@bab = "test"
 
-when I "click" on "selector" then
+when I "click" on ".div > text" then
   add ".is-open" on @ccc
   remove ".is-clean"
 end

@@ -1,9 +1,10 @@
 const boundaries = {
-  'lowercase': [],
+  'lowercase': ['65-90'],
   'uppercase': [],
-  'numbers': [],
-  'whitespace': []
+  'numbers': ['48-57']
 }
+
+let letterCache = {}
 
 export default function range(...charSets) {
 

@@ -1,5 +1,6 @@
-// TODO: import node debug module and place inside the lexer for
-// easier debugging until I add some tests to this
+import debug from 'debug'
+
+debug('uiscript')
 
 export const formats = {
   // TODO: range helper for groups of allowed characters
@@ -46,6 +47,7 @@ types.toggle = types.trigger
 types.when = types.declarationStart
 types.I = types.naturalLang
 types.on = types.naturalLang
+types.assignment = types['=']
 
 //
 // Lexer
@@ -128,6 +130,19 @@ export default class Lexer {
     while (this.next() !== '\n') {}
   }
 
+  // Should be called after the tokens have been created
+  nextToken() {
+    return this.tokens.shift()
+  }
+
+  nextTokenType() {
+    return this.tokens[0].type
+  }
+
+  empty() {
+    return !this.tokens.length
+  }
+
   //
   // We'll do this using two passes and build the token stream
   // before the parser constructs the AST
@@ -168,17 +183,15 @@ export default class Lexer {
     }
   }
 
-  //
-  // Each method will lex through a unique token type
-  //
-
-  // returns a match
+  // returns all keywords that have *character* at the
+  // *index* position
   keywordIndexMatch(character, index, keywordSet = keywords) {
     let acc = []
 
     for (let keyword of keywordSet) {
       // index out of bounds for the keyword
       if (index > keyword.length - 1) { continue }
+      // character equality
       if (character === keyword[index]) { acc.push(keyword) }
     }
 
@@ -220,7 +233,7 @@ export default class Lexer {
 
   lexSingle() {
     let single = this.current()
-    // console.log('lexing single char -> ', single)
+    debug('lexing single char -> ', single)
 
     // this.assertType(single)
 
