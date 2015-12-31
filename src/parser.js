@@ -14,6 +14,8 @@ export default class Parser {
 
   // Should always be called first
   // Each line should only begin with one of 3 tokens.
+  // This is for top level staments only - scope blocks are treated
+  // differently
   parse() {
     if (this.lexer.empty()) { return true }
 
@@ -21,14 +23,15 @@ export default class Parser {
     let type = this.lexer.nextTokenType()
 
     while (type) {
-      console.log(type)
-
       // @name ...
       if (type === types.variableName) {
         this.parseVariableAssignment()
       // when ...
       } else if (type === types.declarationStart) {
         this.parseUiDeclaration()
+      } else if (type === types.EOF) {
+        // reached the end
+        break
       } else {
         this.error()
       }
@@ -36,11 +39,17 @@ export default class Parser {
       // fetch the next token if there is one
       type = this.lexer.empty() ? null : this.lexer.nextTokenType()
     }
+
+    console.log('Parsing finished')
   }
 
+  //
+  // Parses the variable and binds it with the current scope object
+  //
   parseVariableAssignment() {
     let varName = this.lexer.nextToken()
     this.assert(varName.type, types.variableName)
+    console.log('variable ->', varName.value)
 
     this.assert(this.lexer.nextToken().type, types.assignment)
 
@@ -57,47 +66,102 @@ export default class Parser {
     let action = this.lexer.nextToken()
     this.assert(action.type, types.string)
 
+    //
+    // TODO: Make sure the event is valid
+    //
+    // this.ensureSupportedAction(action)
+
     this.assert(this.lexer.nextToken().type, types.naturalLang)
 
     let selector = this.lexer.nextToken()
     this.assert(selector.type, types.string)
 
+    // Scope gate
+    //
+    // Inject the element inside the scope so we can implicitly
+    // reference it later
+    this.scopes.addScope({
+      element: selector.value
+    })
+
     this.parseBlock()
+
+    // and remove the scope...
+    this.scopes.removeScope()
   }
 
   parseBlock() {
     this.assert(this.lexer.nextToken().type, types.declarationBlockStart)
+    let type = this.lexer.nextTokenType()
 
-    // Scope gate..
-    this.scopes.addScope()
+    // can I wrap this while inside a generator to automatically grab the next
+    // token?
+    while (type) {
+      // @name ...
+      if (type === types.variableName) {
+        this.parseVariableAssignment()
+      // add, remove, toggle ...
+      } else if (type = types.trigger) {
+        this.parseTriggerStatement()
+      } else {
+        // unexpected token
+        // TODO: create method to throw unexpected token error
+        this.error()
+      }
 
-    this.parseBlockStatements()
-    this.assert(this.lexer.nextToken().type, types.declarationBlockStart)
+      // fetch the next token if there is one
+      type = this.lexer.empty() ? null : this.lexer.nextTokenType()
 
-    // TODO: we should remove the scope here
-  }
+      // we need to escape out of this loop
+      if (type === types.declarationBlockEnd) { break }
+    }
 
-  parseBlockStatements() {
-    while (this.lexer.nextTokenType() === types.trigger) { this.parseBlockStatement() }
+    this.assert(this.lexer.nextToken().type, types.declarationBlockEnd)
   }
 
   // <action> <expression> (? on <variable_name>)
   // toggle ".is-open"
   // toggle ".is-open" on @element
   // toggle ".is-open" on ".different-element"
-  parseBlockStatement() {
+  parseTriggerStatement() {
+    let receiver = null
+
     let trigger = this.lexer.nextToken()
     this.assert(trigger.type, types.trigger)
 
     let selector = this.lexer.nextToken()
     this.assert(selector.type, types.string)
 
-    // NOTE: optional and it will just be bound to the current event
+    // Optional on clause
+    if (this.lexer.nextTokenType() === types.naturalLang) {
+      this.assert(this.lexer.nextToken().type, types.naturalLang)
+
+      if (this.lexer.nextTokenType() === types.variableName) {
+        let reference = this.lexer.nextToken().value
+        receiver = this.scopes.fetch(reference)
+      } else if (this.lexer.nextTokenType() === types.string) {
+        receiver = this.lexer.nextToken().value
+      } else {
+        this.unexpectedError()
+      }
+    }
+
+    // bind any events to the current element in this block
+    receiver = receiver || this.scopes.fetch('element')
+
+    console.log('trigger', trigger.value, 'with', selector.value, 'on', receiver)
   }
 
   assert(actual, expected) {
     if (actual === expected) { return true }
+    let position = this.lexer.activeToken.position
+
     // Doing this right now for this problem https://github.com/nodejs/node/issues/927
-    this.lexer.error(`Expected ${String(expected)} at ${String(actual.position)}`)
+    this.lexer.error(`Expected ${expected.toString()} at ${this.lexer.formatPosition(position)}`)
+  }
+
+  unexpectedError() {
+    let position = this.lexer.activeToken.position
+    this.lexer.error(`Unxpected token at ${this.lexer.formatPosition(position)}`)
   }
 }

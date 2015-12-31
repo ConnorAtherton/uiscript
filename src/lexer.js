@@ -1,10 +1,7 @@
-import debug from 'debug'
-
-debug('uiscript')
+import range from './utils/range'
 
 export const formats = {
-  // TODO: range helper for groups of allowed characters
-  variableName: 'abc',
+  variableName: range('lowercase', 'uppercase'),
   whitespace: ' \t\r\n',
 }
 
@@ -72,6 +69,9 @@ export default class Lexer {
 
     // stores all the tokens from the source
     this.tokens = []
+
+    // Reference the current token the parse is considering
+    this.activeToken = null
   }
 
   get position() {
@@ -132,7 +132,8 @@ export default class Lexer {
 
   // Should be called after the tokens have been created
   nextToken() {
-    return this.tokens.shift()
+    this.activeToken = this.tokens.shift()
+    return this.activeToken
   }
 
   nextTokenType() {
@@ -233,7 +234,6 @@ export default class Lexer {
 
   lexSingle() {
     let single = this.current()
-    debug('lexing single char -> ', single)
 
     // this.assertType(single)
 

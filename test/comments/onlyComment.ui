@@ -1,13 +1,19 @@
 //
-// This is a file that only has comments
+// Test file
 //
 
-@abc = "string"
-@bab = "test"
+// Every variable represents a DOM element present at the time
+// the JavaScript output is executed.
+@first = "string"
+@camelCase = "test"
 
 when I "click" on ".div > text" then
-  add ".is-open" on @ccc
-  remove ".is-clean"
+  @inBlock = ".scopeTest"
+
+  add ".is-open"
+  add ".is-open" on @aaa
+  add ".is-open" on @bab
+  add ".is-open" on "tester"
 end
 
 

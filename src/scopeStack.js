@@ -28,6 +28,12 @@ export default class ScopeStack {
 
   // reaches up through the scope chain
   fetch(key) {
-    // TODO: ...
+    let len = this.scopes.length
+
+    while (len--) {
+      if (this.scopes[len][key]) { return this.scopes[len][key] }
+    }
+
+    return null
   }
 }
