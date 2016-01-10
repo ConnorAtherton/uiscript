@@ -1,5 +1,13 @@
+import fs from 'fs'
+import path from 'path'
+import split from 'split'
 import { types } from './lexer'
+import ReplaceStream from './utils/replaceStream'
 import ScopeStack from './scopeStack'
+
+const supportedActions = [
+  'click', 'dblclick', 'mouseover', 'mousein', 'mouseout'
+]
 
 export default class Parser {
   constructor(lexer) {
@@ -7,6 +15,9 @@ export default class Parser {
     // with the @ stripped off
     this.scopes = new ScopeStack()
     this.lexer = lexer
+
+    // TODO: temp
+    this.triggers = []
 
     // split into tokens
     this.lexer.lex()
@@ -33,14 +44,32 @@ export default class Parser {
         // reached the end
         break
       } else {
-        this.error()
+        this.unexpectedError()
       }
 
       // fetch the next token if there is one
       type = this.lexer.empty() ? null : this.lexer.nextTokenType()
     }
+  }
 
-    console.log('Parsing finished')
+  //
+  // Outputs to a file descriptor
+  //
+  write(fd = process.stdout) {
+    const template = path.resolve(__dirname, './templates/wrapper.js')
+    const input = fs.createReadStream(template)
+
+    // let output = fs.createWriteStream(fd, {
+    //   flags: 'w+'
+    // })
+
+    input.pipe(split())
+      .pipe(new ReplaceStream({
+        content: `${this.triggers.join('\n')}\n`,
+        pattern: /---> uiscript$/
+      }))
+      // .pipe(output)
+      .pipe(fd)
   }
 
   //
@@ -65,11 +94,7 @@ export default class Parser {
 
     let action = this.lexer.nextToken()
     this.assert(action.type, types.string)
-
-    //
-    // TODO: Make sure the event is valid
-    //
-    // this.ensureSupportedAction(action)
+    this.ensureSupportedAction(action.value)
 
     this.assert(this.lexer.nextToken().type, types.naturalLang)
 
@@ -149,7 +174,13 @@ export default class Parser {
     // bind any events to the current element in this block
     receiver = receiver || this.scopes.fetch('element')
 
-    console.log('trigger', trigger.value, 'with', selector.value, 'on', receiver)
+    // TODO: add this to the graph
+    this.triggers.push(`trigger ${trigger.value} with ${selector.value} on ${receiver}`)
+  }
+
+  ensureSupportedAction(action) {
+    if (supportedActions.includes(action)) { return true }
+    this.unexpectedError()
   }
 
   assert(actual, expected) {

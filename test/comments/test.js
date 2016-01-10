@@ -12,4 +12,5 @@ fs.readFile(fp, function(err, source) {
   let parser = new Parser(lexer)
 
   parser.parse()
+  parser.write()
 })
