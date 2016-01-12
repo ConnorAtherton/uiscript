@@ -10,10 +10,17 @@
 when I "click" on ".div > text" then
   @inBlock = ".scopeTest"
 
-  add ".is-open"
-  add ".is-open" on @aaa
-  add ".is-open" on @bab
-  add ".is-open" on "tester"
+  // implicit reference
+  add ".implicit"
+
+  // inner scope
+  remove ".inner-scope" on @inBlock
+
+  // outer scope
+  toggle ".outer-scope" on @first
+
+  // selector
+  add ".selector" on "body"
 end
 
 

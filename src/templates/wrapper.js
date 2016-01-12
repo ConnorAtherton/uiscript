@@ -1,12 +1,18 @@
 (function(root) {
-  root.uiUtils = {
+  var $ = document.querySelectorAll
+
+  root.ui = {
     events: {
-      addEvent(elem, evt, fn) {
-        return elem.addEventListener(evt, fn, false)
+      addEvent(nodeList, evt, fn) {
+        Array.from(nodeList).forEach(elem => {
+          elem.addEventListener(evt, fn, false)
+        })
       },
 
-      removeEvent(elem, evt, fn) {
-        return elem.removeEventListener(evt, fn, false)
+      removeEvent(nodeList, evt, fn) {
+        Array.from(nodeList).forEach(elem => {
+          elem.removeEventListener(evt, fn, false)
+        })
       }
     },
 
@@ -16,7 +22,7 @@
       },
 
       add(elem, attr, val) {
-        if (!root.uiUtils.klass.has(elem, attr, val)) {
+        if (!root.ui.dom.has(elem, attr, val)) {
           elem[attr] += (elem[attr] && ' ') + val
         }
       },
@@ -26,8 +32,8 @@
       },
 
       toggle(elem, attr, val) {
-        let method = root.uiUtils.dom.has(elem, attr, val) ? 'remove' : 'add'
-        root.uiUtils[method](elem, attr, val)
+        let method = root.ui.dom.has(elem, attr, val) ? 'remove' : 'add'
+        root.ui.dom[method](elem, attr, val)
       }
     }
   }

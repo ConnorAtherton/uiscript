@@ -10,14 +10,15 @@ const supportedActions = [
 ]
 
 export default class Parser {
-  constructor(lexer) {
+  constructor(lexer, writer = {}) {
     // holds a reference to all variables declared in the script
     // with the @ stripped off
     this.scopes = new ScopeStack()
     this.lexer = lexer
+    this.writer = writer
 
-    // TODO: temp
-    this.triggers = []
+    this.triggerStack = []
+    this.ast = []
 
     // split into tokens
     this.lexer.lex()
@@ -59,13 +60,35 @@ export default class Parser {
     const template = path.resolve(__dirname, './templates/wrapper.js')
     const input = fs.createReadStream(template)
 
+    console.log(this.ast)
+
     // let output = fs.createWriteStream(fd, {
     //   flags: 'w+'
     // })
 
+    let content = ''
+
+    const globals = this.scopes.first
+
+    for (let key of Object.keys(globals)) {
+      content += `var $${key} = $('${globals[key]}')\n`
+    }
+
+    let info = this.ast[0]
+    let body = info.actions.map(function(action) {
+      return `    root.ui.dom[${action[0]}]($('${action[1]}'), 'class', '${action[2]}')`
+    }).join('\n')
+
+    content += `\n(function() {
+  var $__selector__ = $('${info.trigger[1]}')
+  root.ui.events.addEvent($__selector__, '${info.trigger[0]}', function(e) {
+${body}
+  })
+})()\n`
+
     input.pipe(split())
       .pipe(new ReplaceStream({
-        content: `${this.triggers.join('\n')}\n`,
+        content: content.split('\n').map(l => `  ${l}`).join('\n'),
         pattern: /---> uiscript$/
       }))
       // .pipe(output)
@@ -106,12 +129,19 @@ export default class Parser {
     // Inject the element inside the scope so we can implicitly
     // reference it later
     this.scopes.addScope({
-      element: selector.value
+      '__element__': selector.value
     })
 
     this.parseBlock()
 
-    // and remove the scope...
+    let node = { trigger: [action.value, selector.value], actions: [] }
+
+    while (this.triggerStack.length) {
+      let trigger = this.triggerStack.pop()
+      node.actions.push(trigger)
+    }
+
+    this.ast.push(node)
     this.scopes.removeScope()
   }
 
@@ -164,6 +194,10 @@ export default class Parser {
       if (this.lexer.nextTokenType() === types.variableName) {
         let reference = this.lexer.nextToken().value
         receiver = this.scopes.fetch(reference)
+
+        if (receiver === null) {
+          this.error(`Found an unbound variable reference @${reference}`, reference)
+        }
       } else if (this.lexer.nextTokenType() === types.string) {
         receiver = this.lexer.nextToken().value
       } else {
@@ -172,10 +206,11 @@ export default class Parser {
     }
 
     // bind any events to the current element in this block
-    receiver = receiver || this.scopes.fetch('element')
+    receiver = receiver || this.scopes.fetch('__element__')
 
     // TODO: add this to the graph
-    this.triggers.push(`trigger ${trigger.value} with ${selector.value} on ${receiver}`)
+    // console.log(this.scopes)
+    this.triggerStack.push([trigger.value, selector.value, receiver])
   }
 
   ensureSupportedAction(action) {
@@ -194,5 +229,10 @@ export default class Parser {
   unexpectedError() {
     let position = this.lexer.activeToken.position
     this.lexer.error(`Unxpected token at ${this.lexer.formatPosition(position)}`)
+  }
+
+  error(text) {
+    let position = this.lexer.activeToken.position
+    this.lexer.error(`Error: ${text}, at ${this.lexer.formatPosition()}`)
   }
 }

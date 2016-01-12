@@ -6,6 +6,10 @@ export default class ScopeStack {
     this.addScope()
   }
 
+  get first() {
+    return this.scopes[0]
+  }
+
   get last() {
     return this.scopes[this.scopes.length - 1]
   }
