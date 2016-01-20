@@ -9,6 +9,10 @@ const supportedActions = [
   'click', 'dblclick', 'mouseover', 'mousein', 'mouseout'
 ]
 
+const supportedTriggers = [
+  'add', 'remove', 'toggle'
+]
+
 export default class Parser {
   constructor(lexer, writer = {}) {
     // holds a reference to all variables declared in the script
@@ -76,7 +80,7 @@ export default class Parser {
 
     let info = this.ast[0]
     let body = info.actions.map(function(action) {
-      return `    root.ui.dom[${action[0]}]($('${action[1]}'), 'class', '${action[2]}')`
+      return `    root.ui.dom['${action[0]}']($('${action[1]}'), 'class', '${action[2]}')`
     }).join('\n')
 
     content += `\n(function() {
@@ -101,7 +105,6 @@ ${body}
   parseVariableAssignment() {
     let varName = this.lexer.nextToken()
     this.assert(varName.type, types.variableName)
-    console.log('variable ->', varName.value)
 
     this.assert(this.lexer.nextToken().type, types.assignment)
 
@@ -117,7 +120,7 @@ ${body}
 
     let action = this.lexer.nextToken()
     this.assert(action.type, types.string)
-    this.ensureSupportedAction(action.value)
+    this.assertSupportedAction(action.value)
 
     this.assert(this.lexer.nextToken().type, types.naturalLang)
 
@@ -183,6 +186,7 @@ ${body}
 
     let trigger = this.lexer.nextToken()
     this.assert(trigger.type, types.trigger)
+    this.assertSupportedTrigger(trigger.value)
 
     let selector = this.lexer.nextToken()
     this.assert(selector.type, types.string)
@@ -213,8 +217,13 @@ ${body}
     this.triggerStack.push([trigger.value, selector.value, receiver])
   }
 
-  ensureSupportedAction(action) {
+  assertSupportedAction(action) {
     if (supportedActions.includes(action)) { return true }
+    this.unexpectedError()
+  }
+
+  assertSupportedTrigger(trigger) {
+    if (supportedTriggers.includes(trigger)) { return true }
     this.unexpectedError()
   }
 

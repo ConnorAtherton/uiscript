@@ -18,7 +18,6 @@ export default class ReplaceStream extends TransformStream {
     } else {
       // make sure to append a newline again after split
       this.push(new Buffer(chunk + '\n'))
-
       this.inserting = false
     }
 

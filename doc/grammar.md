@@ -1,23 +1,42 @@
 # Grammar
 
-[ nonterminal ]
+This grammar is written in extended Backus-Naur form.
 
-terminal
+<program> :
+  <expression>
 
----
+<expression> :
+  <assignment>
+  <trigger_declaration>
 
-comment => //
-[ program ] **-->** [ expression ] ...
+<assignment> :
+  <variable> = <selector_string>
 
-// expressions here will usually always be variables
-[ ui_declaration ] **-->** when I [ event_value ] on [ expression ] [ block ]
+<selector> :
+  <variable>
+  <selector_string>
 
-[ trigger_declaration ] **-->** variable [ block ]
-[ expression ] --> [ selector ]
-               --> [ variable ]
+<variable> :
+  @/[a-zA-Z]+/
 
-[ block ] **-->** then [ block_statements_list ] end
-[ block_statements_list ] **-->** [ block_statements_list ] | [ block_statement ]
-[ event_value ] --> click | hover | doubleclick
+<trigger_declaration> :
+ when <natural_language> <action> <natural_language> <selector> <block>
+
+<natural_launguage> :
+  (I | on)
+
+<block> :
+  then <block_statements_list> end
+
+<block_statements_list> :
+  <block_statement> {, <block_statement>}
+
+<block_statement> :
+  <trigger> <selector> {<natural_language> <selector>}
+
+<action> :
+  (click | hover | doubleclick)
+
+
 
 
