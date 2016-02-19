@@ -1,6 +1,7 @@
 # Grammar
 
-This grammar is written in extended Backus-Naur form.
+The following is a context-free grammar for the uiscript language
+written in extended Backus-Naur form.
 
 <program> :
   <expression>
@@ -32,7 +33,7 @@ This grammar is written in extended Backus-Naur form.
   <block_statement> {, <block_statement>}
 
 <block_statement> :
-  <trigger> <selector> {<natural_language> <selector>}
+  <trigger> <selector> [<natural_language> <selector>]
 
 <action> :
   (click | hover | doubleclick)
