@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import split from 'split'
+import concat from 'concat-stream'
 import { types } from './lexer'
 import ReplaceStream from './utils/replaceStream'
 import ScopeStack from './scopeStack'
@@ -60,31 +61,28 @@ export default class Parser {
   //
   // Outputs to a file descriptor
   //
-  write(fd = process.stdout) {
+  write(fd = process.stdout, transformFunctions = []) {
     const template = path.resolve(__dirname, './templates/wrapper.js')
     const input = fs.createReadStream(template)
 
     console.log(this.ast)
 
-    // let output = fs.createWriteStream(fd, {
-    //   flags: 'w+'
-    // })
-
+    const globals = this.scopes.first
     let content = ''
 
-    const globals = this.scopes.first
-
     for (let key of Object.keys(globals)) {
-      content += `var $${key} = $('${globals[key]}')\n`
+      content += `var $${key} = query('${globals[key]}')\n`
     }
 
     let info = this.ast[0]
     let body = info.actions.map(function(action) {
-      return `    root.ui.dom['${action[0]}']($('${action[1]}'), 'class', '${action[2]}')`
+      return `   root.ui.dom['${action[0]}'](${action[2]}, '${action[1]}')`
     }).join('\n')
 
+    console.log('info', info)
+
     content += `\n(function() {
-  var $__selector__ = $('${info.trigger[1]}')
+  var $__selector__ = document.querySelectorAll('${info.trigger[1]}')
   root.ui.events.addEvent($__selector__, '${info.trigger[0]}', function(e) {
 ${body}
   })
@@ -95,8 +93,13 @@ ${body}
         content: content.split('\n').map(l => `  ${l}`).join('\n'),
         pattern: /---> uiscript$/
       }))
-      // .pipe(output)
-      .pipe(fd)
+      .pipe(concat(function(output) {
+        let transformed = transformFunctions.reduce((acc, fn) => {
+          return fn(acc)
+        }, output.toString())
+
+        fd.write(transformed)
+      }))
   }
 
   //
@@ -209,8 +212,8 @@ ${body}
       }
     }
 
-    // bind any events to the current element in this block
-    receiver = receiver || this.scopes.fetch('__element__')
+    // bind any events to the current element in this block if no explicit reference given
+    receiver = receiver || 'e.currentTarget'
 
     // TODO: add this to the graph
     // console.log(this.scopes)
@@ -218,12 +221,12 @@ ${body}
   }
 
   assertSupportedAction(action) {
-    if (supportedActions.includes(action)) { return true }
+    if (~supportedActions.indexOf(action)) { return true }
     this.unexpectedError()
   }
 
   assertSupportedTrigger(trigger) {
-    if (supportedTriggers.includes(trigger)) { return true }
+    if (~supportedTriggers.indexOf(trigger)) { return true }
     this.unexpectedError()
   }
 

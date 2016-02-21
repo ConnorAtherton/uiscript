@@ -34,5 +34,5 @@ export default function range(...charSets) {
     }()))
   })
 
-  return acc
+  return acc.join('')
 }

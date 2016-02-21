@@ -21,7 +21,7 @@ written in extended Backus-Naur form.
   @/[a-zA-Z]+/
 
 <trigger_declaration> :
- when <natural_language> <action> <natural_language> <selector> <block>
+ when <natural_language> <action> [<natural_language>] <selector> <block>
 
 <natural_launguage> :
   (I | on)
@@ -37,7 +37,3 @@ written in extended Backus-Naur form.
 
 <action> :
   (click | hover | doubleclick)
-
-
-
-

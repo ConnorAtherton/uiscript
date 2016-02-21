@@ -1,12 +1,11 @@
-const error = (name, code) => {
+const error = name => {
   return class UIScriptError extends Error {
     constructor(message) {
       super(`[uiscript] ${name}: ${message}`)
-      this.status = code
     }
   }
 }
 
 export const Errors = {
-  UnexpectedToken: error('ParseError', 1)
+  UnexpectedToken: error('UnexpectedToken')
 }

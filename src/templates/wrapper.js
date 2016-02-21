@@ -1,39 +1,62 @@
 (function(root) {
-  var $ = document.querySelectorAll
+  var query = document.querySelectorAll
 
   root.ui = {
+    forEachNode: function(nodeList, cb) {
+      // convert it to an array if it isn't already
+      if (nodeList.nodeType && nodeList.nodeType === 1) {
+        nodeList = [nodeList]
+      }
+
+      Array.from(nodeList).forEach(elem => cb(elem))
+    },
+
     events: {
       addEvent(nodeList, evt, fn) {
-        Array.from(nodeList).forEach(elem => {
+        root.ui.forEachNode(nodeList, function(elem) {
           elem.addEventListener(evt, fn, false)
         })
       },
 
       removeEvent(nodeList, evt, fn) {
-        Array.from(nodeList).forEach(elem => {
+        root.ui.forEachNode(nodeList, function(elem) {
           elem.removeEventListener(evt, fn, false)
         })
       }
     },
 
     dom: {
-      has(elem, attr, val) {
-        return elem[attr].indexOf(val) !== -1
+      has(elem, val) {
+        return elem.className && elem.className.indexOf(val) !== -1
       },
 
-      add(elem, attr, val) {
-        if (!root.ui.dom.has(elem, attr, val)) {
-          elem[attr] += (elem[attr] && ' ') + val
-        }
+      add(nodeList, val) {
+        console.log('adding a class node list')
+        root.ui.forEachNode(nodeList, function(elem) {
+          console.log('adding a class', elem, val)
+
+          if (!root.ui.dom.has(elem, val)) {
+            console.log('does not have the class', elem, val)
+            elem.className += (elem.className && ' ') + val
+          }
+        })
       },
 
-      remove(elem, attr, val) {
-        elem[attr] = (elem[attr]).replace(val, '')
+      remove(nodeList, val) {
+        root.ui.forEachNode(nodeList, function(elem) {
+          console.log('removing a class', val)
+
+          elem.className = (elem.className).replace(val, '')
+        })
       },
 
-      toggle(elem, attr, val) {
-        let method = root.ui.dom.has(elem, attr, val) ? 'remove' : 'add'
-        root.ui.dom[method](elem, attr, val)
+      toggle(nodeList, val) {
+        root.ui.forEachNode(nodeList, function(elem) {
+          let method = root.ui.dom.has(elem, val) ? 'remove' : 'add'
+          root.ui.dom[method](elem, val)
+
+          console.log('toggling a class', elem.toString(), elem.className, method, val)
+        })
       }
     }
   }

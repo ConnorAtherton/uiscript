@@ -1,0 +1,9 @@
+//
+// A simple click using explicit element variable
+//
+
+when I "click" on "button" then
+  toggle "is-active"
+end
+
+
