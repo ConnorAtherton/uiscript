@@ -61,12 +61,13 @@
     }
   };
 
-  
-  (function() {
-    var $__selector__ = document.querySelectorAll('button')
-    root.ui.events.addEvent($__selector__, 'click', function(e) {
-     root.ui.dom['add'](e.currentTarget, 'is-active')
-    })
-  })()
-  
+
+(function() {
+  var $__selector__ = document.querySelectorAll('button')
+  root.ui.events.addEvent($__selector__, 'click', function(e) {
+    root.ui.dom['toggle'](e.currentTarget, 'is-now-active')
+    root.ui.dom['toggle'](e.currentTarget, 'is-active')
+  })
+})()
+
 })(window);

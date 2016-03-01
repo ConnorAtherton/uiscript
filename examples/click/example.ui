@@ -4,6 +4,7 @@
 
 when I "click" on "button" then
   toggle "is-active"
+  toggle "is-now-active"
+  // toggle "is-active" on '.link'
+  // toggle "is-active" on @variable
 end
-
-

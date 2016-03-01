@@ -3,8 +3,11 @@ import path from 'path'
 import split from 'split'
 import concat from 'concat-stream'
 import { types } from './lexer'
-import ReplaceStream from './utils/replaceStream'
 import ScopeStack from './scopeStack'
+import Tree from './tree'
+import ReplaceStream from './utils/replaceStream'
+import BlockNode from './nodes/block'
+import TriggerNode from './nodes/trigger'
 
 const supportedActions = [
   'click', 'dblclick', 'mouseover', 'mousein', 'mouseout'
@@ -15,15 +18,18 @@ const supportedTriggers = [
 ]
 
 export default class Parser {
-  constructor(lexer, writer = {}) {
+  constructor(lexer) {
+    this.lexer = lexer
+
     // holds a reference to all variables declared in the script
     // with the @ stripped off
     this.scopes = new ScopeStack()
-    this.lexer = lexer
-    this.writer = writer
 
-    this.triggerStack = []
-    this.ast = []
+    // list of block nodes for the program
+    this.ast = new Tree()
+
+    // holds all block declarations for the current block in scope
+    this.blockStatements = []
 
     // split into tokens
     this.lexer.lex()
@@ -64,33 +70,20 @@ export default class Parser {
   write(fd = process.stdout, transformFunctions = []) {
     const template = path.resolve(__dirname, './templates/wrapper.js')
     const input = fs.createReadStream(template)
-
-    console.log(this.ast)
-
     const globals = this.scopes.first
+
+    console.log(this.ast.toString())
+
     let content = ''
 
-    for (let key of Object.keys(globals)) {
-      content += `var $${key} = query('${globals[key]}')\n`
-    }
-
-    let info = this.ast[0]
-    let body = info.actions.map(function(action) {
-      return `   root.ui.dom['${action[0]}'](${action[2]}, '${action[1]}')`
-    }).join('\n')
-
-    console.log('info', info)
-
-    content += `\n(function() {
-  var $__selector__ = document.querySelectorAll('${info.trigger[1]}')
-  root.ui.events.addEvent($__selector__, '${info.trigger[0]}', function(e) {
-${body}
-  })
-})()\n`
+    // TODO: Add a root node and add all global variables there
+    // for (let key of Object.keys(globals)) {
+    //   content += `var $${key} = query('${globals[key]}')\n`
+    // }
 
     input.pipe(split())
       .pipe(new ReplaceStream({
-        content: content.split('\n').map(l => `  ${l}`).join('\n'),
+        content: this.ast.toString(),
         pattern: /---> uiscript$/
       }))
       .pipe(concat(function(output) {
@@ -140,14 +133,14 @@ ${body}
 
     this.parseBlock()
 
-    let node = { trigger: [action.value, selector.value], actions: [] }
+    // let node = { trigger: [action.value, selector.value], actions: [] }
+    let blockNode = new BlockNode(action.value, selector.value)
 
-    while (this.triggerStack.length) {
-      let trigger = this.triggerStack.pop()
-      node.actions.push(trigger)
+    while (this.blockStatements.length) {
+      blockNode.addStatement(this.blockStatements.pop())
     }
 
-    this.ast.push(node)
+    this.ast.push(blockNode)
     this.scopes.removeScope()
   }
 
@@ -217,7 +210,8 @@ ${body}
 
     // TODO: add this to the graph
     // console.log(this.scopes)
-    this.triggerStack.push([trigger.value, selector.value, receiver])
+    let triggerNode = new TriggerNode(trigger.value, selector.value, receiver)
+    this.blockStatements.push(triggerNode)
   }
 
   assertSupportedAction(action) {

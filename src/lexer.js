@@ -123,7 +123,7 @@ export default class Lexer {
   }
 
   skipWhitespace() {
-    while (formats.whitespace.includes(this.peek())) { this.next() }
+    while (~formats.whitespace.indexOf(this.peek())) { this.next() }
   }
 
   skipLine() {
@@ -170,9 +170,9 @@ export default class Lexer {
     } else if (character === '/') {
       this.lexComment()
       return this.tokenize()
-    } else if ('='.includes(character)) {
+    } else if (~'='.indexOf(character)) {
       return this.lexSingle()
-    } else if (formats.whitespace.includes(character)) {
+    } else if (~formats.whitespace.indexOf(character)) {
       this.skipWhitespace()
       return this.tokenize()
     } else if (this.keywordStart(character)) {
@@ -212,7 +212,7 @@ export default class Lexer {
     let finalMatch
 
     // tokens must be surrounded by whitespace
-    while (matches.length && !formats.whitespace.includes(this.peek())) {
+    while (matches.length && !~formats.whitespace.indexOf(this.peek())) {
       // increment both pointers at the same time
       this.next() && index++
 
@@ -252,11 +252,11 @@ export default class Lexer {
 
     // NOTE: ignore the initial @ symbol
     // but expect the next character to be valid
-    if (!this.assert(formats.variableName.includes(varName), true)) {
+    if (!this.assert(~formats.variableName.indexOf(varName), true)) {
       this.errorExpected('a valid variable name character')
     }
 
-    while (formats.variableName.includes(this.peek())) {
+    while (~formats.variableName.indexOf(this.peek())) {
       varName += this.next()
     }
 

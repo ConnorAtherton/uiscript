@@ -23,7 +23,7 @@ written in extended Backus-Naur form.
 <trigger_declaration> :
  when <natural_language> <action> [<natural_language>] <selector> <block>
 
-<natural_launguage> :
+<natural_language> :
   (I | on)
 
 <block> :
