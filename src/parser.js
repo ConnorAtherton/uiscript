@@ -39,7 +39,7 @@ export default class Parser {
   // This is for top level staments only - scope blocks are treated
   // differently
   parse() {
-    if (this.lexer.empty()) { return true }
+    if (this.lexer.empty()) { return }
 
     // we know we have at least once token so don't need to type check
     let type = this.lexer.nextTokenType()
@@ -204,18 +204,18 @@ export default class Parser {
   }
 
   assertSupportedAction(action) {
-    if (~supportedActions.indexOf(action)) { return true }
+    if (~supportedActions.indexOf(action)) { return }
     this.unexpectedError()
   }
 
   assertSupportedTrigger(trigger) {
-    if (~supportedTriggers.indexOf(trigger)) { return true }
+    if (~supportedTriggers.indexOf(trigger)) { return }
     this.unexpectedError()
   }
 
   assert(actual, expected) {
     if (!Array.isArray(expected)) { expected = [expected] }
-    if (~expected.indexOf(actual)) { return true }
+    if (~expected.indexOf(actual)) { return }
 
     let position = this.lexer.activeToken.position
 
@@ -229,7 +229,6 @@ export default class Parser {
   }
 
   error(text) {
-    let position = this.lexer.activeToken.position
     this.lexer.error(`Error: ${text}, at ${this.lexer.formatPosition()}`)
   }
 }

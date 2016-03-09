@@ -5,7 +5,7 @@ import Lexer from './lexer'
 import Parser from './parser'
 import { futils } from './utils/futils'
 
-function buildTransformPipeline(options) {
+function buildTransformPipeline() {
   return []
 }
 

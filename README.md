@@ -1,11 +1,10 @@
-# uiscript
+# uiscript ![Build Status](https://api.travis-ci.org/ConnorAtherton/uiscript.svg)
 
 A web UI manipulation language for humans.
 
-uiscript is a simple language for. uiscript makes the
-the following assumptions:
+uiscript makes the the following assumptions:
 
-- Animations should be declared in css using stateful classes (.is-open, .has-hovered)
+- Animations should be declared in CSS using stateful classes (.is-open, .has-hovered)
 - Event management should be handled by JavaScript (adding event handlers and managing DOM attributes)
 
 ## Installing
@@ -77,7 +76,7 @@ assume any actions you take will be related to the event target (@element).
 
 ```
 when I 'click' on '.menu_item' then
-  toggle '.open'
+  toggle '.is-open'
 end
 ```
 
@@ -93,7 +92,7 @@ the page.
 
 ```
 // Caches every node with the menu_item class
-@menu_item '.menu_item'
+@menuItem = '.menu_item'
 ```
 
 We can then use that cached reference in our animation
@@ -101,39 +100,8 @@ declarations.
 
 ```
 // Add a click event on a cached DOM element
-when I 'click' on @menu_item then
-  toggle '.open' on @element
-end
-```
-
-### Sequences
-
-[TODO]
-
-Sequences are a linear conbination of actions.
-
-Use sequences when:
-- You want to re-use the same steps across multiple different
-  events (think global actions, like updating a notification counter).
-- An animation is complex and you want to extract it from the
-  event declaration for clarity. As a rule of thumb, any action
-  that is 10 lines or more should be split into a sequence.
-
-```
-// The @ syntax declares the sequence name
-@logged_in_animation then
-  add 'erer' to 'sdsdsd'
-end
-```
-
-Use the `run` keyword to start a sequence.
-
-```
-// run a trigger using the run keyword
-when I 'click' on @menu_item then
-  // run a named sequence
-  // NOTE: will throw an error if no sequence exists with the name
-  run logged_in_animation
+when I 'click' on @menuItem then
+  toggle '.is-open'
 end
 ```
 
@@ -145,7 +113,7 @@ in future releases.
 - click
 - doubleclick
 - hover
-- mousup
+- mouseup
 - mousedown
 - mouseover
 

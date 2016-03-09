@@ -1,5 +1,7 @@
 ;(function(root) {
+  /* eslint-disable no-unused-vars */
   let query = document.querySelectorAll.bind(document)
+  /* eslint-enable no-unused-vars */
 
   root.ui = {
     forEachNode: function(nodeList, cb) {
@@ -12,15 +14,11 @@
 
     events: {
       addEvent(nodeList, evt, fn) {
-        root.ui.forEachNode(nodeList, function(elem) {
-          elem.addEventListener(evt, fn, false)
-        })
+        root.ui.forEachNode(nodeList, elem => elem.addEventListener(evt, fn, false))
       },
 
       removeEvent(nodeList, evt, fn) {
-        root.ui.forEachNode(nodeList, function(elem) {
-          elem.removeEventListener(evt, fn, false)
-        })
+        root.ui.forEachNode(nodeList, elem => elem.removeEventListener(evt, fn, false))
       }
     },
 

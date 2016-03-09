@@ -15,7 +15,7 @@ export default class ReceiverNode {
     case 'implicit':
       return this.value
     default:
-      console.error('Unexpected node type')
+      return console.error('Unexpected node type')
     }
   }
 }

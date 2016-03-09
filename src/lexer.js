@@ -179,7 +179,7 @@ export default class Lexer {
       return this.lexKeyword()
       throw Error
     } else {
-      console.error('unknown character', character)
+      return console.error('unknown character', character)
     }
   }
 
@@ -213,7 +213,8 @@ export default class Lexer {
     // tokens must be surrounded by whitespace
     while (matches.length && !~formats.whitespace.indexOf(this.peek())) {
       // increment both pointers at the same time
-      this.next() && index++
+      this.next()
+      index++
 
       // limit possible keywords to those already matched at lower indices
       matches = this.keywordIndexMatch(this.current(), index, matches)
@@ -294,10 +295,10 @@ export default class Lexer {
     this.skipLine()
   }
 
-  // asserts the equality of two chracters
-  assert(actual, expected, func) {
+  // asserts the equality of two values
+  assert(actual, expected, func = function() {}) {
     if (actual !== expected) {
-      func && func()
+      func()
       return false
     }
 
