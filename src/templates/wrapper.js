@@ -1,10 +1,9 @@
-(function(root) {
-  var query = document.querySelectorAll
+;(function(root) {
+  let query = document.querySelectorAll.bind(document)
 
   root.ui = {
     forEachNode: function(nodeList, cb) {
-      // convert it to an array if it isn't already
-      if (nodeList.nodeType && nodeList.nodeType === 1) {
+      if (nodeList && nodeList.nodeType && nodeList.nodeType === 1) {
         nodeList = [nodeList]
       }
 
@@ -31,12 +30,8 @@
       },
 
       add(nodeList, val) {
-        console.log('adding a class node list')
         root.ui.forEachNode(nodeList, function(elem) {
-          console.log('adding a class', elem, val)
-
           if (!root.ui.dom.has(elem, val)) {
-            console.log('does not have the class', elem, val)
             elem.className += (elem.className && ' ') + val
           }
         })
@@ -44,8 +39,6 @@
 
       remove(nodeList, val) {
         root.ui.forEachNode(nodeList, function(elem) {
-          console.log('removing a class', val)
-
           elem.className = (elem.className).replace(val, '')
         })
       },
@@ -54,8 +47,6 @@
         root.ui.forEachNode(nodeList, function(elem) {
           let method = root.ui.dom.has(elem, val) ? 'remove' : 'add'
           root.ui.dom[method](elem, val)
-
-          console.log('toggling a class', elem.toString(), elem.className, method, val)
         })
       }
     }

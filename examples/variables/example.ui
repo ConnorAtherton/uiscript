@@ -2,7 +2,8 @@
 // A simple click using explicit element variable
 //
 
-when I "click" on "button" then
-  add "is-clicked-once"
+@buttons = "button"
+
+when I "click" on @buttons then
   toggle "is-active"
 end

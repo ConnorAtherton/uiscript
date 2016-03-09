@@ -179,8 +179,7 @@ export default class Lexer {
       return this.lexKeyword()
       throw Error
     } else {
-      // unknown character
-      console.log('unknown character', character)
+      console.error('unknown character', character)
     }
   }
 
@@ -245,22 +244,18 @@ export default class Lexer {
   }
 
   lexVariableName() {
-    // console.log('lexing variable name')
-
     let startPosition = this.position
     let varName = this.next()
 
     // NOTE: ignore the initial @ symbol
     // but expect the next character to be valid
-    if (!this.assert(~formats.variableName.indexOf(varName), true)) {
+    if (!~formats.variableName.indexOf(varName)) {
       this.errorExpected('a valid variable name character')
     }
 
     while (~formats.variableName.indexOf(this.peek())) {
       varName += this.next()
     }
-
-    // console.log('lexing a variable -> ', varName)
 
     return {
       type: types.variableName,
@@ -270,8 +265,6 @@ export default class Lexer {
   }
 
   lexString() {
-    // console.log('lexing string value')
-
     let startPosition = this.position
     let string = this.next()
 
@@ -280,8 +273,6 @@ export default class Lexer {
     }
 
     if (this.next() !== '"') { this.errorExpected('"') }
-
-    // console.log('lexing a string -> ', string)
 
     return {
       value: string,
@@ -294,8 +285,6 @@ export default class Lexer {
   // TODO: allow comments at the end of lines too
   //
   lexComment() {
-    // console.log('lexing comment')
-
     this.assert(this.peek(), '/', () => {
       this.errorExpected('/')
     })

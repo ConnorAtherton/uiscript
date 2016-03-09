@@ -15,11 +15,11 @@ export default class ScopeStack {
   }
 
   addScope(scope = {}) {
-    this.scopes.push(scope)
+    return this.scopes.push(scope)
   }
 
   removeScope() {
-    this.scopes.pop()
+    return this.scopes.pop()
   }
 
   add(key, val) {

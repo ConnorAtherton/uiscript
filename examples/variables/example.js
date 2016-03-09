@@ -1,12 +1,11 @@
 'use strict';
 
-(function (root) {
-  var query = document.querySelectorAll;
+;(function (root) {
+  var query = document.querySelectorAll.bind(document);
 
   root.ui = {
     forEachNode: function forEachNode(nodeList, cb) {
-      // convert it to an array if it isn't already
-      if (nodeList.nodeType && nodeList.nodeType === 1) {
+      if (nodeList && nodeList.nodeType && nodeList.nodeType === 1) {
         nodeList = [nodeList];
       }
 
@@ -33,20 +32,14 @@
         return elem.className && elem.className.indexOf(val) !== -1;
       },
       add: function add(nodeList, val) {
-        console.log('adding a class node list');
         root.ui.forEachNode(nodeList, function (elem) {
-          console.log('adding a class', elem, val);
-
           if (!root.ui.dom.has(elem, val)) {
-            console.log('does not have the class', elem, val);
             elem.className += (elem.className && ' ') + val;
           }
         });
       },
       remove: function remove(nodeList, val) {
         root.ui.forEachNode(nodeList, function (elem) {
-          console.log('removing a class', val);
-
           elem.className = elem.className.replace(val, '');
         });
       },
@@ -54,25 +47,18 @@
         root.ui.forEachNode(nodeList, function (elem) {
           var method = root.ui.dom.has(elem, val) ? 'remove' : 'add';
           root.ui.dom[method](elem, val);
-
-          console.log('toggling a class', elem.toString(), elem.className, method, val);
         });
       }
     }
   };
 
-var $first = document.querySelectorAll('string')
-var $camelCase = document.querySelectorAll('test')
+var $buttons = query('button')
 
-(function() {
-  var $__selector__ = document.querySelectorAll('.div > text')
-  var $inBlock = document.querySelectorAll('.scopeTest')
+;(function() {
 
-  root.ui.events.addEvent($__selector__, 'click', function(e) {
-    root.ui.dom['add'](document.querySelectorAll('body'), '.selector')
-    root.ui.dom['toggle']($first, '.outer-scope')
-    root.ui.dom['remove']($inBlock, '.inner-scope')
-    root.ui.dom['add'](e.currentEvent, '.implicit')
+
+  root.ui.events.addEvent($buttons, 'click', function(e) {
+    root.ui.dom['toggle'](e.currentTarget, 'is-active')
   })
 })()
 
