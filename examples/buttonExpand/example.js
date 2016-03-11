@@ -54,13 +54,13 @@
     }
   };
 
-var $buttons = query('button')
 
 ;(function() {
-
-
-  root.ui.events.addEvent($buttons, 'click', function(e) {
-    root.ui.dom['toggle'](e.currentTarget, 'is-active')
+  var $__target__ = query('.Button--cta')
+  root.ui.events.addEvent($__target__, 'click', function(e) {
+  
+    root.ui.dom['add'](e.currentTarget, 'Button--active')
+    root.ui.dom['add'](query('.Information-section'), 'is-expanded')
   })
 })()
 

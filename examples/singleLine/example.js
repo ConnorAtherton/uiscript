@@ -54,12 +54,11 @@
     }
   };
 
-var $buttons = query('button')
 
 ;(function() {
+  var $__target__ = query('button')
 
-
-  root.ui.events.addEvent($buttons, 'click', function(e) {
+  root.ui.events.addEvent($__target__, 'dblclick', function(e) {
     root.ui.dom['toggle'](e.currentTarget, 'is-active')
   })
 })()

@@ -27,7 +27,7 @@ written in extended Backus-Naur form.
   (I | on)
 
 <block> :
-  then <block_statements_list> end
+  then <block_statements_list> <declaration_block_end>
 
 <block_statements_list> :
   <block_statement> {, <block_statement>}
@@ -37,3 +37,6 @@ written in extended Backus-Naur form.
 
 <action> :
   (click | hover | doubleclick)
+
+<declaration_block_end> :
+  (end | .)

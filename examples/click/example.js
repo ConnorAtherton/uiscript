@@ -1,7 +1,9 @@
 'use strict';
 
 ;(function (root) {
+  /* eslint-disable no-unused-vars */
   var query = document.querySelectorAll.bind(document);
+  /* eslint-enable no-unused-vars */
 
   root.ui = {
     forEachNode: function forEachNode(nodeList, cb) {
@@ -17,12 +19,12 @@
     events: {
       addEvent: function addEvent(nodeList, evt, fn) {
         root.ui.forEachNode(nodeList, function (elem) {
-          elem.addEventListener(evt, fn, false);
+          return elem.addEventListener(evt, fn, false);
         });
       },
       removeEvent: function removeEvent(nodeList, evt, fn) {
         root.ui.forEachNode(nodeList, function (elem) {
-          elem.removeEventListener(evt, fn, false);
+          return elem.removeEventListener(evt, fn, false);
         });
       }
     },

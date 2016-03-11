@@ -13,7 +13,7 @@ import ReceiverNode from './nodes/receiver'
 import TargetNode from './nodes/target'
 
 const supportedActions = [
-  'click', 'dblclick', 'mouseover', 'mousein', 'mouseout'
+  'click', 'dblclick', 'mouseover', 'mouseenter', 'mouseexit'
 ]
 
 const supportedTriggers = [
@@ -70,7 +70,8 @@ export default class Parser {
     const template = path.resolve(__dirname, './templates/wrapper.js')
     const input = fs.createReadStream(template)
 
-    console.log(this.ast.toString())
+    // TODO: Move this into debug call
+    // console.log(this.ast.toString())
 
     input.pipe(split())
       .pipe(new ReplaceStream({
@@ -197,8 +198,6 @@ export default class Parser {
     // bind any events to the current element in this block if no explicit reference given
     receiver = receiver || new ReceiverNode('implicit')
 
-    // TODO: add this to the graph
-    // console.log(this.scopes)
     let triggerNode = new TriggerNode(trigger.value, selector.value, receiver)
     this.blockStatements.push(triggerNode)
   }

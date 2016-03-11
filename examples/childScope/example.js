@@ -54,13 +54,15 @@
     }
   };
 
-var $buttons = query('button')
+var $links = query('a')
 
 ;(function() {
 
+  root.ui.events.addEvent($links, 'mouseenter', function(e) {
+    // TODO: Can we perform scoping here so we don't dump into DOM on every event
+    var $links = query('a.special')
 
-  root.ui.events.addEvent($buttons, 'click', function(e) {
-    root.ui.dom['toggle'](e.currentTarget, 'is-active')
+    root.ui.dom['toggle']($links, 'has-mouseenter')
   })
 })()
 

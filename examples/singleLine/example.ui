@@ -1,0 +1,6 @@
+//
+// There is also a shorthand single line syntax
+// than can be terminated with a period (.).
+//
+
+when I "dblclick" on "button" then toggle "is-active".

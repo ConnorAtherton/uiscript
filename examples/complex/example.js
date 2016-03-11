@@ -54,13 +54,18 @@
     }
   };
 
-var $buttons = query('button')
+var $first = query('string')
+var $camelCase = query('test')
 
 ;(function() {
+  var $__target__ = query('.div > text')
+  var $inBlock = query('.scopeTest')
 
-
-  root.ui.events.addEvent($buttons, 'click', function(e) {
-    root.ui.dom['toggle'](e.currentTarget, 'is-active')
+  root.ui.events.addEvent($__target__, 'click', function(e) {
+    root.ui.dom['add'](query('body'), '.selector')
+    root.ui.dom['toggle']($first, '.outer-scope')
+    root.ui.dom['remove']($inBlock, '.inner-scope')
+    root.ui.dom['add'](e.currentTarget, '.implicit')
   })
 })()
 

@@ -25,8 +25,8 @@ export default class BlockNode {
 
     return `\n;(function() {
 ${this.requireNewTarget() ? newTarget : ''}
-${scopeVariables}
   root.ui.events.addEvent(${eventTarget}, '${this.action}', function(e) {
+  ${scopeVariables}
 ${body}
   })
 })()\n`

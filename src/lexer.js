@@ -14,12 +14,19 @@ export const keywords = [
 //
 // Each keyword should respond to a type
 //
+
+// Since each Symbol is unique we need to share some here
+// so we can use two alternate lexemes to represent a single
+// node type.
+const declarationBlockEndSymbol = Symbol('UI_DECLARATION_BLOCK_END')
+
 export const types = {
   variableName: Symbol('UI_VARIABLE_NAME'),
   string: Symbol('UI_STRING'),
   declarationStart: Symbol('UI_DECLARATION_START'),
   declarationBlockStart: Symbol('UI_DECLARATION_BLOCK_START'),
-  declarationBlockEnd: Symbol('UI_DECLARATION_BLOCK_END'),
+  declarationBlockEnd: declarationBlockEndSymbol,
+  '.': declarationBlockEndSymbol,
   trigger: Symbol('UI_TRIGGER'),
   '=': Symbol('UI_ASSIGNMENT'),
   // these tokens are just to keep the language sounding natural for
@@ -170,7 +177,7 @@ export default class Lexer {
     } else if (character === '/') {
       this.lexComment()
       return this.tokenize()
-    } else if (~'='.indexOf(character)) {
+    } else if (~'=.'.indexOf(character)) {
       return this.lexSingle()
     } else if (~formats.whitespace.indexOf(character)) {
       this.skipWhitespace()

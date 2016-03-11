@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>uiscript example</title>
+    <style>
+      body, html {
+        body: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .Button--cta {
+        background: red;
+        color: white;
+      }
+
+      .Button--cta.Button--active {
+        background: blue
+      }
+
+      .Information-section {
+        transition: all 500ms;
+        height: 20px;
+        overflow: hidden;
+      }
+
+      .Information-section.is-expanded {
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="Button--cta">Click me</button>
+    <section class="Information-section">
+      Closed.
+      </br>
+      And exanded.
+    </section>
+    <script src="./example.js"></script>
+  </body>
+</html>

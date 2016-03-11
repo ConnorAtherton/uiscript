@@ -1,0 +1,16 @@
+//
+// An example of using scopes.
+// This isn't a good idea for common events that fire a lot
+// since it looks for the nodes on every event.
+//
+
+// Caches every anchor node
+@links = "a"
+
+// Add an event on a cached DOM element
+when I "mouseenter" on @links then
+  @links = "a.special"
+
+  // a.special is the target here
+  toggle "has-mouseenter" on @links
+end

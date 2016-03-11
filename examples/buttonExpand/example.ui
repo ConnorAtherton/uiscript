@@ -1,0 +1,5 @@
+when I "click" on ".Button--cta" then
+  // <trigger> <classSelector> on <element>
+  add "is-expanded" on ".Information-section"
+  add "Button--active"
+end
