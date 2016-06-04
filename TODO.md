@@ -1,7 +1,5 @@
 # TODO
 
-- Improve parsing errors. We could show the exact code position instead of printing the line
-  and character information.
 - Better examples
 - Tests
 - Add support for inline comments

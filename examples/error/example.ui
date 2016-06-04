@@ -1,0 +1,7 @@
+//
+// Used for testing the error messages in the console
+//
+
+@2323 = "test"
+
+// when I "dblclick" "button" then toggle "is-active".

@@ -10,9 +10,9 @@ function buildTransformPipeline() {
 }
 
 export default function run(input, outputDir, options) {
-  input.forEach(file => {
-    futils.exists(file)
-      .then(() => futils.read(file) )
+  const promises = input.map(file => {
+    return futils.exists(file)
+      .then(() => futils.read(file))
       .then(source => {
         let lexer = new Lexer(source)
         let parser = new Parser(lexer)
@@ -26,10 +26,16 @@ export default function run(input, outputDir, options) {
         parser.write(fd, transforms)
 
         hw.log(`{yellow}${file}{/} -> ${dest}`)
+
+        return new Promise(resolve => resolve(true))
       })
       .catch(err => {
         console.error(err.stack)
       })
+  })
+
+  Promise.all(promises).then(function(values) {
+    console.log(`\n${values.length} files finished`)
   })
 }
 

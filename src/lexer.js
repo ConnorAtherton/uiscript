@@ -1,4 +1,5 @@
 import range from './utils/range'
+import hw from 'headway'
 
 export const formats = {
   variableName: range('lowercase', 'uppercase'),
@@ -38,7 +39,7 @@ export const types = {
 }
 
 //
-// keyword types mappings
+// Keyword types mappings
 //
 // Keep these distinct from the actual types to make it easier
 // to modify the keywords later on.
@@ -61,11 +62,16 @@ types.assignment = types['=']
 // and use to run the program.
 //
 export default class Lexer {
+  // @param {Buffer} source
   constructor(source) {
     // Force the source into a string so we can accept
     // a Buffer object as an input too
     this.source = source.toString()
     this.sourceLength = source.length
+
+    // TODO: Support a debug flag to optionally enable this functionality.
+    // Means we store the source twice in memory and make 2 passes instead of 1.
+    this.linesForDebug = this.source.split('\n')
 
     // holds the position of the current character
     this.line = 1
@@ -317,6 +323,8 @@ export default class Lexer {
   }
 
   errorExpected(expectStr, position = this.position) {
+    hw.log('{_bold}' + this.linesForDebug[this.position.line - 1])
+    hw.log('{red}' + ' '.repeat(this.position.character - 1) + '⇑')
     this.error(`Expected ${expectStr} at ${this.formatPosition(position)}`)
   }
 
