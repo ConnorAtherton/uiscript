@@ -1,4 +1,4 @@
-const error = name => {
+const error = (name) => {
   return class UIScriptError extends Error {
     constructor(message) {
       super(`[uiscript] ${name}: ${message}`)

@@ -1,0 +1,22 @@
+html,
+body {
+  padding: 0;
+  width: 100vw;
+  padding: 100px;
+  height: 100vh;
+  background: #2dd7aa;
+}
+
+.u-component {
+  overflow: hidden;
+  position: relative;
+  padding: 40px 30px 40px 0;
+  border-radius: 4px;
+  color: #9a9ea1;
+  font-size: 14px;
+  max-width: 500px;
+}
+
+.c-button {
+
+}
