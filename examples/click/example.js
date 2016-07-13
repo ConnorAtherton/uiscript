@@ -57,8 +57,8 @@
 
 ;(function() {
   var $__target__ = query('button')
-
   root.ui.events.addEvent($__target__, 'click', function(e) {
+  
     root.ui.dom['toggle'](e.currentTarget, 'is-active')
     root.ui.dom['add'](e.currentTarget, 'is-clicked-once')
   })

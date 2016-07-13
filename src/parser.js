@@ -79,9 +79,7 @@ export default class Parser {
         pattern: /---> uiscript$/
       }))
       .pipe(concat(function(output) {
-        let transformed = transformFunctions.reduce((acc, fn) => {
-          return fn(acc)
-        }, output.toString())
+        const transformed = transformFunctions.reduce((acc, fn) => fn(acc), output.toString())
 
         fd.write(transformed)
       }))

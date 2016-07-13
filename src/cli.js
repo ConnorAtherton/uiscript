@@ -24,4 +24,4 @@ const input = cli.args.reduce((globs, glob) => {
   return globs.concat(files)
 }, [])
 
-run(input, '.', {})
+run(input, cli)
