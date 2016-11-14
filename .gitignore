@@ -16,6 +16,8 @@ lib-cov
 coverage
 node_modules
 
+examples/**/*.js
+
 # Transpiled js should not be present and should instead be run at installation
 dist
 bin/uiscript

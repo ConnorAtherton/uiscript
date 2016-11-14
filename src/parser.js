@@ -70,8 +70,6 @@ export default class Parser {
     const template = path.resolve(__dirname, './templates/wrapper.js')
     const input = fs.createReadStream(template)
 
-    console.log('Transform functions', transformFunctions)
-
     // TODO: Move this into debug call
     // console.log(this.ast.toString())
 
