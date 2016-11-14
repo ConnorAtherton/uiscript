@@ -5,5 +5,5 @@
 @buttons = "button"
 
 when I "click" on @buttons then
-  toggle "is-active"
+  toggle "is-active" // Inline comment now
 end

@@ -110,7 +110,7 @@ Opening a new block using the `then` keyword will create a new variable scope wi
 
 // Add an event on a cached DOM element
 when I "dblclick" on @links then
-  @links = "a.special"
+  @links = "a.special" // fetch all active links
 
   // a.special is the target
   toggle "is-clicked" on @links
@@ -128,6 +128,14 @@ for other events fired by the browser that aren't initiated by an explicit user 
 - `mouseup`
 - `mousedown`
 - `mouseover`
+
+### Transforms
+
+You can also pass optional cli arguments to `uiscript` that will transform the output.
+
+```
+-m, --minify   Minify all js output
+```
 
 ### Contributing
 

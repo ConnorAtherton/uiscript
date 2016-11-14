@@ -10,7 +10,7 @@ cli
   .description(description)
   .usage('<files...> [options]')
   .option('-o, --out', 'List output destination.')
-  .option('-w, --watch', 'Recompile files on changes')
+  .option('-w, --watch', 'Recompile files on changes.')
   .option('-m, --minify', 'Minify output.')
   .parse(process.argv)
 
