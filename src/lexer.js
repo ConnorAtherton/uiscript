@@ -178,7 +178,7 @@ export default class Lexer {
       return this.lexVariableName()
     } else if (character === null) {
       return { val: null, type: types.EOF, position: this.position }
-    } else if (character === '"') {
+    } else if (character === '"' || character === "'") { // eslint-disable-line quotes
       return this.lexString()
     } else if (character === '/') {
       this.lexComment()
@@ -279,14 +279,16 @@ export default class Lexer {
   }
 
   lexString() {
+    // NOTE: This allows strings to use " or '
+    const strOpen = this.current()
     let startPosition = this.position
     let string = this.next()
 
-    while (this.peek() && this.peek() !== '"') {
+    while (this.peek() && this.peek() !== strOpen) {
       string += this.next()
     }
 
-    if (this.next() !== '"') { this.errorExpected('"') }
+    if (this.next() !== strOpen) { this.errorExpected(strOpen) }
 
     return {
       value: string,
@@ -296,7 +298,7 @@ export default class Lexer {
   }
 
   //
-  // TODO: allow comments at the end of lines too
+  // NOTE: Comments are allowed at the end of a line too
   //
   lexComment() {
     this.assert(this.peek(), '/', () => {

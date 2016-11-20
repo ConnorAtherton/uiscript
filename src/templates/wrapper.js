@@ -30,7 +30,7 @@
       add(nodeList, val) {
         root.ui.forEachNode(nodeList, function(elem) {
           if (!root.ui.dom.has(elem, val)) {
-            elem.className += (elem.className && ' ') + val
+            elem.classList.add(val)
           }
         })
       },

@@ -71,7 +71,7 @@ export default class Parser {
     const input = fs.createReadStream(template)
 
     // TODO: Move this into debug call
-    // console.log(this.ast.toString())
+    console.log(this.ast.toString())
 
     input.pipe(split())
       .pipe(new ReplaceStream({
@@ -123,7 +123,7 @@ export default class Parser {
     let blockNode = new BlockNode(action.value, targetNode)
 
     while (this.blockStatements.length) {
-      blockNode.addStatement(this.blockStatements.pop())
+      blockNode.addStatement(this.blockStatements.shift())
     }
 
     blockNode.scope = this.ast.scopes.removeScope()

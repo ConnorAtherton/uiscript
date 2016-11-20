@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>uiscript example</title>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        color: #fff;
+        position: relative;
+        transition: all .3s ease-in-out;
+        font-family: -apple-system,BlinkMacSystemFont,avenir next,avenir,helvetica,helvetica neue,ubuntu,roboto,noto,segoe ui,arial,sans-serif;
+      }
+
+      .content-body {
+        height: 300vh;
+        background: linear-gradient(#9571F7,#4AD4B1) no-repeat;
+        transition: all .3s ease-in-out;
+      }
+
+      .content-body.first { transform: translate3d(0,0,0); }
+      .content-body.second { transform: translate3d(0,-100vh,0); }
+      .content-body.third { transform: translate3d(0,-200vh,0); }
+
+      .content-body > div {
+        height: 100vh;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .content-body > div > h1 {
+        flex: 1;
+      }
+
+      nav {
+        display: block;
+        width: 200px;
+        height: 290px;
+        position: fixed;
+        top: calc(50% - 290px / 2);
+        left: 20px;
+      }
+
+      .nav-item {
+        display: block;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 22px 0 22px 18px;
+        opacity: .2;
+        position: relative;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      .nav-item.isActive,
+      .nav-item:hover {
+        opacity: 1;
+      }
+
+      .nav-marker {
+        top: 10px;
+        left: 0;
+        width: 4px;
+        height: 44px;
+        position: absolute;
+        background: #fff;
+        border-radius: 4px;
+        transition: all 350ms ease;
+        -webkit-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        margin: 0;
+      }
+
+      .nav-marker.first { transform: translate3d(0,0,0); }
+      .nav-marker.second { transform: translate3d(0,61px,0); }
+      .nav-marker.third { transform: translate3d(0,122px,0); }
+    </style>
+  </head>
+  <body>
+    <div class='content-body first'>
+      <div>
+        <h1>1</h1>
+      </div>
+      <div>
+        <h1>2</h1>
+      </div>
+      <div>
+        <h1>3</h1>
+      </div>
+    </div>
+
+    <nav>
+      <section class='nav-item isActive'>First section</section>
+      <section class='nav-item'>Second section</section>
+      <section class='nav-item'>Third section</section>
+      <figure class='nav-marker'></figure>
+    </nav>
+    <script src="./example.js"></script>
+  </body>
+</html>
