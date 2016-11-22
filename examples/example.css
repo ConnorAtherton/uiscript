@@ -1,22 +1,55 @@
+* {
+  box-sizing: border-box;
+}
+
 html,
 body {
-  padding: 0;
+  margin: 0;
   width: 100vw;
-  padding: 100px;
   height: 100vh;
   background: #2dd7aa;
-}
-
-.u-component {
-  overflow: hidden;
+  padding: 0;
+  color: #fff;
   position: relative;
-  padding: 40px 30px 40px 0;
-  border-radius: 4px;
-  color: #9a9ea1;
-  font-size: 14px;
-  max-width: 500px;
+  transition: all .3s ease-in-out;
+  font-family: -apple-system,BlinkMacSystemFont,avenir next,avenir,helvetica,helvetica neue,ubuntu,roboto,noto,segoe ui,arial,sans-serif;
 }
 
-.c-button {
+ul {
+  padding: 0;
+}
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Helpers */
+
+.p100 {
+  padding: 100px;
+}
+
+/* Lists */
+.list--light {
+  color: #fff;
+  transition: all .25s ease;
+}
+
+.list-item {
+  display: block;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 20px 0;
+  opacity: .5;
+  position: relative;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.list-item.isActive,
+.list-item:hover {
+  opacity: 1;
 }
