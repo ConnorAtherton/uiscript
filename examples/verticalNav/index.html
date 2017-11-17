@@ -74,6 +74,62 @@
       <section class='list-item nav-item'>Third section</section>
       <figure class='nav-marker'></figure>
     </nav>
-    <script src="./example.js"></script>
+    <script src='../../dist/uiscript.js'></script>
+    <script type='text/uiscript'>
+      @body = ".content-body"
+      @navLinks = ".nav-item"
+      @marker = ".nav-marker"
+
+      //
+      // TODO: Being able to do @marker.reset!, possibly?
+      //
+      // Ideally, we have a set number of states the component can appear
+      // in and that should be known before the user does anything to interact
+      // with the component. To remove all existing states, we could add some
+      // to make clearing easier. Maybe some kind of enum-like syntax then?
+      //
+      // list @states =
+      //   "first"
+      //   "second"
+      //   "third"
+      //
+      // remove @states on @marker
+      //
+      when I "click" on @navLinks then
+        // First, mark none as active and mark the current as active
+        remove "isActive" on @navLinks
+        add "isActive"
+      end
+
+      when I "click" on ".nav-item:nth-child(1)" then
+        remove "second" on @marker
+        remove "third" on @marker
+        remove "second" on @body
+        remove "third" on @body
+
+        add "first" on @marker
+        add "first" on @body
+      end
+
+      when I "click" on ".nav-item:nth-child(2)" then
+        remove "first" on @marker
+        remove "third" on @marker
+        remove "first" on @body
+        remove "third" on @body
+
+        add "second" on @marker
+        add "second" on @body
+      end
+
+      when I "click" on ".nav-item:nth-child(3)" then
+        remove "first" on @marker
+        remove "second" on @marker
+        remove "first" on @body
+        remove "second" on @body
+
+        add "third" on @marker
+        add "third" on @body
+      end
+    </script>
   </body>
 </html>

@@ -21,6 +21,13 @@
   <body>
     <button>Click me</button>
     <button>Click me 2</button>
-    <script src="./example.js"></script>
+
+    <script src='../../dist/uiscript.js'></script>
+    <script type='text/uiscript'>
+      when I "click" on "button" then
+        add "is-clicked-once"
+        toggle "is-active"
+      end
+    </script>
   </body>
 </html>

@@ -1,5 +1,11 @@
 import range from './utils/range'
-import hw from 'headway'
+
+//
+// NOTE: Passthrough for now until I split out the node from the browser stuff
+//
+const hw = {
+  log () {}
+}
 
 export const formats = {
   variableName: range('lowercase', 'uppercase'),

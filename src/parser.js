@@ -1,11 +1,14 @@
-import fs from 'fs'
-import path from 'path'
-import split from 'split'
-import concat from 'concat-stream'
+//
+// TODO: All of this logic should go in the node bundle
+//
+// import fs from 'fs'
+// import path from 'path'
+// import split from 'split'
+// import concat from 'concat-stream'
+// import ReplaceStream from './utils/replaceStream'
 
 import { types } from './lexer'
 import Tree from './tree'
-import ReplaceStream from './utils/replaceStream'
 
 import BlockNode from './nodes/block'
 import TriggerNode from './nodes/trigger'
@@ -66,24 +69,26 @@ export default class Parser {
   //
   // Outputs to a file descriptor
   //
-  write(fd = process.stdout, transformFunctions = []) {
-    const template = path.resolve(__dirname, './templates/wrapper.js')
-    const input = fs.createReadStream(template)
+  // Move to node specific
+  //
+  // write(fd = process.stdout, transformFunctions = []) {
+  //   const template = path.resolve(__dirname, './templates/wrapper.js')
+  //   const input = fs.createReadStream(template)
 
-    // TODO: Move this into debug call
-    console.log(this.ast.toString())
+  //   // TODO: Move this into debug call
+  //   console.log(this.ast.toString())
 
-    input.pipe(split())
-      .pipe(new ReplaceStream({
-        content: this.ast.toString(),
-        pattern: /---> uiscript$/
-      }))
-      .pipe(concat(function(output) {
-        const transformed = transformFunctions.reduce((acc, fn) => fn(acc), output.toString())
+  //   input.pipe(split())
+  //     .pipe(new ReplaceStream({
+  //       content: this.ast.toString(),
+  //       pattern: /---> uiscript$/
+  //     }))
+  //     .pipe(concat(function(output) {
+  //       const transformed = transformFunctions.reduce((acc, fn) => fn(acc), output.toString())
 
-        fd.write(transformed)
-      }))
-  }
+  //       fd.write(transformed)
+  //     }))
+  // }
 
   //
   // Parses the variable and binds it with the current scope object

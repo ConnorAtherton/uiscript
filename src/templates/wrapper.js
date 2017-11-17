@@ -1,4 +1,5 @@
-;(function(root) {
+export default (code) => (`
+  ;(function(root) {
   /* eslint-disable no-unused-vars */
   let query = document.querySelectorAll.bind(document)
   /* eslint-enable no-unused-vars */
@@ -50,6 +51,7 @@
     }
   }
 
-// ---> uiscript
+  ${code}
 
 }(window))
+`)

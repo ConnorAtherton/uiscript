@@ -2,7 +2,8 @@
 
 - Better examples
 - Tests
-- Add browser support to look for script tags with type='text/uiscript'
+- Create a specific node/browser bundle
 - Chained sequence animations (doc/sequences.md)
 - Support `in` keyword for delays: `toggle 'class' on 'elements' in '200ms'`
+- Support for multi-assignment classes `add 'isActive' on @button and @body`
 
