@@ -1,5 +1,3 @@
 language: node_js
 node_js:
- - "6.9"
-script:
- - npm run lint
+ - "8.9"

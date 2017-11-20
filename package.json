@@ -2,11 +2,12 @@
   "name": "uiscript",
   "version": "0.2.1",
   "description": "A human-readable web ui manipulation language",
-  "main": "bin/uiscript",
+  "main": "dist/runner",
   "bin": "bin/uiscript",
+  "browser": "dist/uiscript.js",
   "scripts": {
-    "test": "npm run lint",
-    "prepublish": "npm test && npm run lint && gulp",
+    "test": "yarn lint",
+    "prepublish": "yarn test",
     "lint": "eslint src/ test/"
   },
   "repository": {
