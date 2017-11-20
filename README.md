@@ -17,14 +17,15 @@ Install it globally through npm.
 npm install -g uiscript
 ```
 
-__TODO__ This can't be run in a browser, yet.
-
 ## Running
 
-A uiscript file should have the file extension `.ui`
+A uiscript file should have the file extension `.ui`.
 
 ```
-uiscript example.ui
+$ uiscript example.ui
+> example.ui => example.js
+>
+> 1 file finished
 ```
 
 ## Syntax
@@ -141,4 +142,9 @@ You can also pass optional cli arguments to `uiscript` that will transform the o
 
 Pull requests and issue submissions are encouraged. I've added some example tasks in the `TODO.md`
 but feel free to work on anything that interests you.
+
+To start working on the project you must have rollup installed. After that, open a new terminal and
+run `rollup -cw` to start watching for file changes either to the browser bundle or the node bundle.
+
+
 

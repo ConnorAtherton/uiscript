@@ -2,9 +2,10 @@ import range from './utils/range'
 
 //
 // NOTE: Passthrough for now until I split out the node from the browser stuff
+// TODO: Create browser version of headway to print out colors
 //
 const hw = {
-  log () {}
+  log() {}
 }
 
 export const formats = {
@@ -70,6 +71,8 @@ types.assignment = types['=']
 export default class Lexer {
   // @param {Buffer} source
   constructor(source) {
+    console.log('Creating new lexer')
+
     // Force the source into a string so we can accept
     // a Buffer object as an input too
     this.source = source.toString()
@@ -106,9 +109,9 @@ export default class Lexer {
   //
   next() {
     if (this.willOverflow()) { return null }
+
     let character = this.source[++this.index]
 
-    // TODO: note down the current line and char number for debugging
     if (character === '\n') {
       this.line++
       this.lineCharacter = 0
@@ -331,6 +334,8 @@ export default class Lexer {
   }
 
   errorExpected(expectStr, position = this.position) {
+    console.log('tokenize =>', this.source, this.peek())
+
     hw.log('{_bold}' + this.linesForDebug[this.position.line - 1])
     hw.log('{red}' + ' '.repeat(this.position.character - 1) + '⇑')
     this.error(`Expected ${expectStr} at ${this.formatPosition(position)}`)

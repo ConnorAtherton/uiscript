@@ -5,10 +5,9 @@
   "main": "bin/uiscript",
   "bin": "bin/uiscript",
   "scripts": {
-    "test": "mocha --opts test/.opts",
+    "test": "npm run lint",
     "prepublish": "npm test && npm run lint && gulp",
-    "lint": "eslint src/ test/",
-    "examples": "http-server examples"
+    "lint": "eslint src/ test/"
   },
   "repository": {
     "type": "git",
@@ -28,11 +27,9 @@
   "dependencies": {
     "chokidar": "^1.6.0",
     "commander": "2.9.0",
-    "concat-stream": "1.5.2",
     "glob": "7.1.1",
     "headway": "0.3.0",
     "minimist": "^1.2.0",
-    "split": "1.0.0",
     "uglify-js": "^2.7.4"
   },
   "devDependencies": {

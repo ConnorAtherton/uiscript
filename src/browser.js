@@ -19,4 +19,4 @@ const initializeUiscript = () => {
   document.body.appendChild(script)
 }
 
-window.addEventListener("DOMContentLoaded", initializeUiscript, false);
+window.addEventListener('DOMContentLoaded', initializeUiscript, false)

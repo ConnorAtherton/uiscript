@@ -3,9 +3,10 @@ import fs from 'fs'
 import hw from 'headway'
 import chokidar from 'chokidar'
 import uglify from 'uglify-js'
+import { futils } from './utils/futils'
 import Lexer from './lexer'
 import Parser from './parser'
-import { futils } from './utils/futils'
+import template from './templates/wrapper'
 
 let watcher = null
 
@@ -17,6 +18,13 @@ const buildTransformPipeline = (options) => {
   return [
     options.minify && transforms.minify
   ].filter(Boolean)
+}
+
+const write = (astString, fd = process.stdout, transformFunctions = []) => {
+  const transformed = transformFunctions
+    .reduce((acc, fn) => fn(acc), astString)
+
+  fd.write(template(transformed))
 }
 
 export default function run(input, options) {
@@ -46,7 +54,7 @@ export default function run(input, options) {
         let activeTransforms = buildTransformPipeline(options)
 
         parser.parse()
-        parser.write(fd, activeTransforms)
+        write(parser.ast.toString(), fd, activeTransforms)
 
         hw.log(`{yellow}${file}{/} -> ${dest}`)
 
@@ -62,7 +70,9 @@ export default function run(input, options) {
   })
 
   Promise.all(promises).then(function(values) {
-    console.log(`\n${values.length} files finished`)
+    if (!options.watch) {
+      console.log(`\n${values.length} files finished`)
+    }
   })
 }
 

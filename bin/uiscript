@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-import cli from 'commander'
-import { glob as sync } from 'glob'
-import { version, description } from '../package.json'
-import run from '../dist/runner'
+const cli = require('commander')
+const { glob } = require('glob')
+const pkg = require('../package.json')
+const run = require('../dist/runner')
 
 cli
-  .version(version)
-  .description(description)
+  .version(pkg.version)
+  .description(pkg.description)
   .usage('<files...> [options]')
   .option('-o, --out', 'List output destination.')
   .option('-w, --watch', 'Recompile files on changes.')
@@ -18,9 +18,9 @@ if (!cli.args.length) {
   cli.help()
 }
 
-const input = cli.args.reduce((globs, glob) => {
-  let files = sync(glob)
-  if (!files.length) { files = [glob] }
+const input = cli.args.reduce((globs, pattern) => {
+  let files = glob(pattern)
+  if (!files.length) { files = [pattern] }
   return globs.concat(files)
 }, [])
 

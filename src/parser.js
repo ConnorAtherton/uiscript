@@ -1,19 +1,11 @@
-//
-// TODO: All of this logic should go in the node bundle
-//
-// import fs from 'fs'
-// import path from 'path'
-// import split from 'split'
-// import concat from 'concat-stream'
-// import ReplaceStream from './utils/replaceStream'
-
 import { types } from './lexer'
 import Tree from './tree'
-
-import BlockNode from './nodes/block'
-import TriggerNode from './nodes/trigger'
-import ReceiverNode from './nodes/receiver'
-import TargetNode from './nodes/target'
+import {
+  BlockNode,
+  TriggerNode,
+  ReceiverNode,
+  TargetNode
+} from './nodes/index.js'
 
 const supportedActions = [
   'click', 'dblclick', 'mouseover', 'mouseenter', 'mouseexit'
@@ -65,30 +57,6 @@ export default class Parser {
       type = this.lexer.empty() ? null : this.lexer.nextTokenType()
     }
   }
-
-  //
-  // Outputs to a file descriptor
-  //
-  // Move to node specific
-  //
-  // write(fd = process.stdout, transformFunctions = []) {
-  //   const template = path.resolve(__dirname, './templates/wrapper.js')
-  //   const input = fs.createReadStream(template)
-
-  //   // TODO: Move this into debug call
-  //   console.log(this.ast.toString())
-
-  //   input.pipe(split())
-  //     .pipe(new ReplaceStream({
-  //       content: this.ast.toString(),
-  //       pattern: /---> uiscript$/
-  //     }))
-  //     .pipe(concat(function(output) {
-  //       const transformed = transformFunctions.reduce((acc, fn) => fn(acc), output.toString())
-
-  //       fd.write(transformed)
-  //     }))
-  // }
 
   //
   // Parses the variable and binds it with the current scope object
